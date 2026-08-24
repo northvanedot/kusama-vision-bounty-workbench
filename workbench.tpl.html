@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kusama Vision Bounty Workbench</title>
+<style>
+:root{
+  --f-body:'Segoe UI','SF Pro Text',-apple-system,BlinkMacSystemFont,sans-serif;
+  --f-disp:'SF Pro Display','Segoe UI',-apple-system,sans-serif;
+  --f-mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
+  --bg:#0a0a0a; --card:#141414; --inset:#191919;
+  --blue:#6e9fff; --cyan:#5ce0d6; --amber:#d9a441; --red:#e06c75;
+  --tx:#eef0f4; --tx2:#8a8a8a; --tx3:#555; --bd:#222;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--f-body);font-size:15px;
+  line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding:36px 20px 90px}
+.mono{font-family:var(--f-mono)}
+a{color:var(--blue)}
+
+header{display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;padding-bottom:20px;
+  border-bottom:1px solid var(--bd);margin-bottom:22px}
+h1{font-family:var(--f-disp);font-size:28px;font-weight:800;letter-spacing:-.02em;margin:0 0 5px}
+.sub{color:var(--tx2);margin:0;font-size:14.5px}
+#conn{margin-left:auto;font-family:var(--f-mono);font-size:12.5px;color:var(--tx2);white-space:nowrap}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--tx3);margin-right:6px}
+.dot.ok{background:var(--cyan)} .dot.bad{background:var(--red)}
+.dot.busy{background:var(--amber);animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.dot.busy{animation:none}}
+.skel{height:12px;border-radius:6px;background:linear-gradient(90deg,#1a1a1a,#242424,#1a1a1a);
+  background-size:200% 100%;animation:sh 1.3s linear infinite;margin:9px 0}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media(prefers-reduced-motion:reduce){.skel{animation:none}}
+
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab{font-family:var(--f-disp);font-size:13.5px;font-weight:600;padding:8px 15px;border-radius:20px;
+  border:1px solid var(--bd);background:var(--card);color:var(--tx2);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--blue);color:var(--blue)}
+.tab:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+.stats{display:grid;gap:14px;margin-bottom:20px}
+@media(min-width:700px){.stats{grid-template-columns:repeat(3,1fr)}}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px 18px}
+.stat .k{font-family:var(--f-disp);font-size:10px;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--tx3);margin-bottom:4px}
+.stat .v{font-family:var(--f-disp);font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:12px;font-weight:500;color:var(--tx2);margin-left:4px}
+
+.cols{display:grid;gap:20px}
+@media(min-width:960px){.cols{grid-template-columns:290px 1fr;align-items:start}}
+
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px 20px;margin-bottom:16px}
+.panel h2{font-family:var(--f-disp);font-size:12px;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--tx3);margin:0 0 12px}
+
+.kid{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 11px;
+  border-radius:9px;border:1px solid transparent;background:none;color:var(--tx);cursor:pointer;font-size:14px}
+.kid:hover{background:var(--inset)}
+.kid[aria-current="true"]{border-color:var(--blue);background:rgba(110,159,255,.08)}
+.kid .id{font-family:var(--f-mono);font-size:12px;color:var(--tx3);min-width:22px}
+.kid .amt{margin-left:auto;font-variant-numeric:tabular-nums;font-size:13px;color:var(--tx2)}
+.pill{display:inline-block;font-family:var(--f-disp);font-size:10.5px;font-weight:600;padding:2px 9px;
+  border-radius:20px;border:1px solid var(--bd);color:var(--tx2);white-space:nowrap}
+.pill.blue{border-color:rgba(110,159,255,.4);color:var(--blue)}
+.pill.cyan{border-color:rgba(92,224,214,.4);color:var(--cyan)}
+.pill.amber{border-color:rgba(217,164,65,.4);color:var(--amber)}
+
+.rail{display:flex;flex-direction:column;gap:3px}
+.rl{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:9px;border:1px solid transparent;
+  background:none;color:var(--tx2);cursor:pointer;font-size:14px;text-align:left;width:100%}
+.rl:hover{background:var(--inset);color:var(--tx)}
+.rl[aria-current="true"]{border-color:var(--blue);background:rgba(110,159,255,.08);color:var(--tx)}
+.rl .n{font-family:var(--f-mono);font-size:11px;color:var(--tx3);min-width:20px}
+.rl.here .n{color:var(--cyan)}
+.rl .here-tag{margin-left:auto;font-family:var(--f-disp);font-size:9.5px;font-weight:700;
+  letter-spacing:.1em;color:var(--cyan)}
+
+.doc{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 30px}
+.doc h1x{font-family:var(--f-disp);font-size:21px;font-weight:700;margin:0 0 18px;display:block}
+.doc h3{font-family:var(--f-disp);font-size:16px;font-weight:700;margin:26px 0 8px}
+.doc h4{font-family:var(--f-disp);font-size:13.5px;font-weight:700;margin:20px 0 6px;color:var(--tx2)}
+.doc p{margin:0 0 12px}
+.doc ul,.doc ol{margin:0 0 12px;padding-left:22px}
+.doc li{margin-bottom:5px}
+.doc code{font-family:var(--f-mono);font-size:.87em;background:var(--inset);padding:2px 6px;
+  border-radius:5px;border:1px solid var(--bd);color:var(--cyan)}
+.doc pre{background:#0c0c0c;border:1px solid var(--bd);border-radius:9px;padding:13px 15px;
+  overflow-x:auto;margin:0 0 14px}
+.doc pre code{background:none;border:none;padding:0;color:var(--tx2);font-size:12.5px;line-height:1.55}
+.doc blockquote{margin:0 0 14px;padding:11px 15px;border-left:3px solid var(--amber);
+  background:rgba(217,164,65,.06);border-radius:0 8px 8px 0;color:var(--tx2)}
+.doc table{width:100%;border-collapse:collapse;font-size:13.5px;margin:0 0 14px;display:block;overflow-x:auto}
+.doc th{font-family:var(--f-disp);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--tx3);text-align:left;padding:0 12px 7px 0;border-bottom:1px solid var(--bd);white-space:nowrap}
+.doc td{padding:7px 12px 7px 0;border-bottom:1px solid var(--bd);vertical-align:top}
+.doc hr{border:none;border-top:1px solid var(--bd);margin:22px 0}
+
+.you{background:rgba(217,164,65,.12);border-bottom:1px solid rgba(217,164,65,.45);
+  padding:1px 4px;border-radius:3px;color:var(--amber);font-family:var(--f-disp);
+  font-size:.85em;font-weight:600;letter-spacing:.04em}
+.fill{background:rgba(92,224,214,.13);border-bottom:1px solid rgba(92,224,214,.45);
+  padding:1px 4px;border-radius:3px;color:var(--cyan);font-family:var(--f-mono);font-size:.95em}
+.doc pre .fill{font-size:1em}
+.builder{margin:22px 0 6px;border:1px solid rgba(110,159,255,.3);border-radius:12px;
+  padding:18px 20px;background:rgba(110,159,255,.04)}
+.builder h3{margin:0 0 14px;font-size:15px;color:var(--blue)}
+.brow{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.builder label{display:block;font-family:var(--f-disp);font-size:10px;font-weight:600;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--tx3);margin-bottom:6px}
+.builder select,.builder input{font-family:var(--f-mono);font-size:14px;padding:9px 12px;
+  background:var(--inset);border:1px solid var(--bd);border-radius:8px;color:var(--tx)}
+.builder select{min-width:230px} .builder input{width:140px}
+#callout{margin-top:16px;border-radius:9px;padding:14px 16px;border:1px solid var(--bd);
+  background:var(--inset);font-size:14px;color:var(--tx2)}
+.callhex{display:block;font-family:var(--f-mono);font-size:12.5px;color:var(--cyan);background:#0007;
+  padding:11px 13px;border-radius:8px;margin:9px 0;word-break:break-all;line-height:1.5}
+.copy{font-family:var(--f-disp);font-size:12px;font-weight:600;padding:6px 14px;border-radius:16px;
+  border:1px solid var(--bd);background:var(--card);color:var(--tx2);cursor:pointer}
+.copy:hover{color:var(--blue);border-color:var(--blue)}
+.verify{margin-top:11px;font-size:12.5px;color:var(--amber)}
+.nobuild{margin:22px 0 6px;border:1px solid rgba(217,164,65,.28);border-radius:12px;padding:15px 18px;
+  background:rgba(217,164,65,.05);font-size:13.5px;color:var(--tx2)}
+
+details.ref{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:0;margin-top:14px}
+details.ref summary{font-family:var(--f-disp);font-size:13px;font-weight:600;padding:14px 20px;cursor:pointer;color:var(--tx2)}
+details.ref summary:hover{color:var(--tx)}
+details.ref .doc{border:none;border-radius:0;padding:0 30px 22px}
+footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--bd);font-size:12.5px;color:var(--tx3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>Kusama Vision Bounty Workbench</h1>
+    <p class="sub">Live chain state and the runbook, side by side. Reads only — it never signs.</p>
+  </div>
+  <div id="conn"><span class="dot"></span>connecting…</div>
+</header>
+
+<div class="tabs" role="tablist" id="tabs"></div>
+
+<div class="stats">
+  <div class="stat"><div class="k">Pot balance</div><div class="v" id="pot"><span class="skel" style="display:inline-block;width:110px;height:20px;vertical-align:middle"></span></div></div>
+  <div class="stat"><div class="k">Recorded value</div><div class="v" id="val">—</div></div>
+  <div class="stat"><div class="k">Headroom</div><div class="v" id="head">—</div></div>
+</div>
+
+<div class="cols">
+  <div>
+    <div class="panel">
+      <h2>Child bounties</h2>
+      <div id="kids"><div class="skel" style="width:88%"></div><div class="skel" style="width:70%"></div><div class="skel" style="width:80%"></div></div>
+    </div>
+    <div class="panel">
+      <h2>Runbook</h2>
+      <div class="rail" id="rail"></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="doc" id="doc"><div class="skel" style="width:45%;height:18px"></div>
+      <div class="skel"></div><div class="skel" style="width:92%"></div><div class="skel" style="width:76%"></div></div>
+    <details class="ref"><summary>Roles and terminology</summary><div class="doc" id="roles"></div></details>
+    <details class="ref"><summary>Common issues and notes</summary><div class="doc" id="issues"></div></details>
+  </div>
+</div>
+
+<footer>Kusama Asset Hub · <span class="mono">multiAssetBounties</span> (pallet 98) ·
+  call data verified against <span class="mono">@polkadot/api</span> · no keys, no signing</footer>
+</div>
+
+<script>
+const SECTIONS = __SECTIONS__;
+
+const RPC='wss://kusama-asset-hub-rpc.polkadot.io';
+const FA='0x30e64a56026f4b5e3c2d196283a9a17db99d880ec681799c0cf30e8886371da997b69dec7cf3a4f83de9da212d99f0be02010902';
+const BOUNTIES='0x673607b30ff936734d4c021c4a99196aa37f719efab16103103a0c8c2c784ce1';
+const CHILDREN='0x673607b30ff936734d4c021c4a99196aedfb05b766f199ce00df85317e33050e';
+const META=[
+ {id:0,name:'Proof of Personhood',           ms:'FhDqdZBwWH16Auzttnc4hurJNVHNZYguMGPWxY2Bjzzxt6G'},
+ {id:1,name:'Art & Social Experiments',      ms:'HNAgeYNFWJeNXBoe5Nf5KHLY5q2hp8X2UJNJjFGnrU8YYjw'},
+ {id:2,name:'Zero-Knowledge & Cryptography', ms:'D3LkMK27GeTV924MVcHJHDPwuHrk1jovzvAKKAoh3SJJHed'},
+];
+const STATUS=[
+ {n:'Funding attempted',  c:'amber', step:'s3'},
+ {n:'Funded',             c:'blue',  step:'s3'},
+ {n:'Curator unassigned', c:'amber', step:'s3'},
+ {n:'Active',             c:'cyan',  step:'s4'},
+ {n:'Refund attempted',   c:'amber', step:'s5'},
+ {n:'Payout attempted',   c:'blue',  step:'s5'},
+];
+const RAIL=[['pre','Pre-check'],['s0','Step 0'],['s1','Step 1'],['s2','Step 2'],
+            ['s3','Step 3'],['s4','Step 4'],['s5','Step 5']];
+// calls offered per step; steps not listed need Nova (complex argument types)
+const BUILDERS={ s0:[[9,'increaseValue']], s3:[[7,'checkStatus'],[3,'acceptCurator'],[4,'unassignCurator']],
+                 s5:[[7,'checkStatus'],[8,'retryPayment'],[6,'closeBounty']] };
+const NOVA={ s1:'Preimage registration is done in Polkadot.js — it takes the raw metadata bytes, not a call this page builds.',
+             s2:'fundChildBounty takes H256 and Option&lt;MultiAddress&gt; arguments. Build it in Nova so the UI encodes them from metadata.',
+             s4:'awardBounty takes a VersionedLocatableAccount beneficiary — the exact argument this runbook documents an encoding bug for. Build it in Nova.' };
+
+/* ── xxhash64 → Twox64Concat ────────────────────────────────────────────── */
+const M=(1n<<64n)-1n,P1=11400714785074694791n,P2=14029467366897019727n,
+      P3=1609587929392839161n,P4=9650029242287828579n,P5=2870177450012600261n;
+const mu=(a,b)=>(a*b)&M,ad=(a,b)=>(a+b)&M,ro=(x,r)=>((x<<r)|(x>>(64n-r)))&M;
+const rn=(a,l)=>mu(ro(ad(a,mu(l,P2)),31n),P1), mg=(a,v)=>ad(mu(a^rn(0n,v),P1),P4);
+const u64=(b,i)=>{let v=0n;for(let k=7;k>=0;k--)v=(v<<8n)|BigInt(b[i+k]);return v};
+const u32b=(b,i)=>BigInt(b[i]|b[i+1]<<8|b[i+2]<<16|b[i+3]<<24)&0xffffffffn;
+function xx(inp,seed=0n){const len=inp.length;let i=0,acc;
+  if(len>=32){let a1=ad(ad(seed,P1),P2),a2=ad(seed,P2),a3=seed,a4=(seed-P1)&M;
+    for(;i<=len-32;i+=32){a1=rn(a1,u64(inp,i));a2=rn(a2,u64(inp,i+8));a3=rn(a3,u64(inp,i+16));a4=rn(a4,u64(inp,i+24));}
+    acc=ad(ad(ro(a1,1n),ro(a2,7n)),ad(ro(a3,12n),ro(a4,18n)));
+    acc=mg(acc,a1);acc=mg(acc,a2);acc=mg(acc,a3);acc=mg(acc,a4);} else acc=ad(seed,P5);
+  acc=ad(acc,BigInt(len));
+  for(;i<=len-8;i+=8) acc=ad(mu(ro(acc^rn(0n,u64(inp,i)),27n),P1),P4);
+  if(i<=len-4){acc=ad(mu(ro(acc^mu(u32b(inp,i),P1),23n),P2),P3);i+=4;}
+  for(;i<len;i++) acc=mu(ro(acc^mu(BigInt(inp[i]),P5),11n),P1);
+  acc=mu(acc^(acc>>33n),P2);acc=mu(acc^(acc>>29n),P3);return acc^(acc>>32n);}
+const hxs=b=>Array.from(b,x=>x.toString(16).padStart(2,'0')).join('');
+const le8=v=>{const o=new Uint8Array(8);let x=v;for(let i=0;i<8;i++){o[i]=Number(x&0xffn);x>>=8n}return o};
+const le=(n,w)=>{const o=new Uint8Array(w);let x=BigInt(n);for(let i=0;i<w;i++){o[i]=Number(x&0xffn);x>>=8n}return o};
+const t64c=b=>hxs(le8(xx(b,0n)))+hxs(b);
+function derive(tag,...ix){const a=new Uint8Array(32);let p=0;
+  for(const c of 'modlpy/trsry'+tag)a[p++]=c.charCodeAt(0);
+  for(const i of ix){a.set(le(i,4),p);p+=4}return hxs(a)}
+
+/* ── SCALE · verified byte-for-byte against @polkadot/api ───────────────── */
+function compact(v){v=BigInt(v);
+  if(v<0n)throw new Error('negative');
+  if(v<64n)return[Number(v)<<2];
+  if(v<16384n){const x=Number(v)<<2|1;return[x&0xff,x>>>8]}
+  if(v<1073741824n){const x=Number(v)*4+2;return[x&0xff,(x>>>8)&0xff,(x>>>16)&0xff,(x>>>24)&0xff]}
+  const b=[];let x=v;while(x>0n){b.push(Number(x&0xffn));x>>=8n}
+  return[((b.length-4)<<2)|3,...b]}
+const optU32=v=>(v===null||v===undefined||v==='')?[0]:[1,v&0xff,(v>>>8)&0xff,(v>>>16)&0xff,(v>>>24)&0xff];
+const PALLET=0x62;
+const toHex=a=>'0x'+a.map(b=>b.toString(16).padStart(2,'0')).join('');
+
+/* ── RPC ────────────────────────────────────────────────────────────────── */
+let ws,seq=0;const waiting=new Map();
+const rpc=(m,p=[])=>new Promise((res,rej)=>{const id=++seq;waiting.set(id,{res,rej});
+  ws.send(JSON.stringify({jsonrpc:'2.0',id,method:m,params:p}));
+  setTimeout(()=>{if(waiting.delete(id))rej(new Error('timeout: '+m))},20000)});
+const connect=()=>new Promise((res,rej)=>{ws=new WebSocket(RPC);
+  ws.onmessage=e=>{const m=JSON.parse(e.data),w=waiting.get(m.id);
+    if(w){waiting.delete(m.id);m.error?w.rej(new Error(m.error.message)):w.res(m.result)}};
+  ws.onopen=res;ws.onerror=()=>rej(new Error('connection failed'));
+  ws.onclose=()=>setConn(false,'disconnected')});
+const $=id=>document.getElementById(id);
+const setConn=(ok,t)=>$('conn').innerHTML='<span class="dot '+(ok?'ok':'bad')+'"></span>'+t;
+const setBusy=t=>$('conn').innerHTML='<span class="dot busy"></span>'+t+'…';
+const fmt=p=>(Number(p)/1e10).toLocaleString(undefined,{maximumFractionDigits:4});
+
+/* ── state ──────────────────────────────────────────────────────────────── */
+let balances=new Map(), bounties=new Map(), kids=new Map();
+let active=0, sel=null, step='pre';
+
+async function loadAll(prog){
+  const batch = async keys => {                    // one round-trip for many keys
+    if(!keys.length) return new Map();
+    const r = await rpc('state_queryStorageAt',[keys]);
+    const m = new Map();
+    for(const ch of (r[0]?.changes||[])) if(ch[1]!==null) m.set(ch[0],ch[1]);
+    return m;
+  };
+  const pageKeys = async pre => {
+    let out=[], last=pre;
+    for(;;){ const pg=await rpc('state_getKeysPaged',[pre,500,last]);
+      if(!pg.length) break; out=out.concat(pg); last=pg[pg.length-1];
+      if(pg.length<500) break; }
+    return out;
+  };
+
+  prog('reading balances');
+  const faKeys = await pageKeys(FA);
+  const faVals = await batch(faKeys);
+  for(const [k,raw] of faVals){
+    const h=raw.slice(2); let v=0n;
+    for(let i=15;i>=0;i--) v=(v<<8n)|BigInt(parseInt(h.substr(i*2,2),16));
+    balances.set(k.slice(-64),v);
+  }
+
+  prog('reading bounties');
+  const bKeys=META.map(b=>BOUNTIES+t64c(le(b.id,4)));
+  const bVals=await batch(bKeys);
+  META.forEach((b,i)=>{
+    const raw=bVals.get(bKeys[i]);
+    if(!raw){ bounties.set(b.id,null); return }
+    const h=raw.slice(2); let v=0n;
+    for(let j=15;j>=0;j--) v=(v<<8n)|BigInt(parseInt(h.substr((7+j)*2,2),16));
+    bounties.set(b.id,{value:v,curator:h.slice(-64)});
+  });
+
+  prog('reading child bounties');
+  const rdU32=(h,i)=>parseInt(h.substr(i*2,8).match(/../g).reverse().join(''),16);
+  const rdU128=(h,i)=>BigInt('0x'+h.substr(i*2,32).match(/../g).reverse().join(''));
+  const cKeys=await pageKeys(CHILDREN);
+  const cVals=await batch(cKeys);
+  for(const k of cKeys){
+    const raw=cVals.get(k); if(!raw) continue;
+    const key=k.slice(2+64), h=raw.slice(2), par=rdU32(key,8);
+    if(!kids.has(par)) kids.set(par,[]);
+    kids.get(par).push({id:rdU32(key,20),value:rdU128(h,4),
+      meta:h.substr(40,64),status:parseInt(h.substr(104,2),16)});
+  }
+  for(const a of kids.values()) a.sort((x,y)=>x.id-y.id);
+}
+
+function renderKids(){
+  const list=kids.get(META[active].id)||[];
+  $('kids').innerHTML = (list.length?list.map(c=>{
+    const s=STATUS[c.status]||{n:'unknown',c:''};
+    return `<button class="kid" data-c="${c.id}" aria-current="${sel===c.id}">`+
+      `<span class="id">#${c.id}</span><span class="pill ${s.c}">${s.n}</span>`+
+      `<span class="amt">${fmt(c.value)} DOT</span></button>`}).join('')
+    : '<p style="color:var(--tx3);font-size:13.5px;margin:0">none yet</p>')+
+    `<button class="kid" data-c="new" aria-current="${sel===null}" style="margin-top:6px">`+
+    `<span class="id">+</span><span style="color:var(--tx2)">New child bounty</span></button>`;
+}
+function renderRail(){
+  const list=kids.get(META[active].id)||[];
+  const cur=sel===null?null:list.find(c=>c.id===sel);
+  const here=cur?(STATUS[cur.status]||{}).step:null;
+  $('rail').innerHTML=RAIL.map(([k,label])=>{
+    const isHere=k===here;
+    return `<button class="rl ${isHere?'here':''}" data-s="${k}" aria-current="${step===k}">`+
+      `<span class="n">${k==='pre'?'·':k[1]}</span><span>${label}</span>`+
+      (isHere?'<span class="here-tag">YOU ARE HERE</span>':'')+`</button>`}).join('');
+}
+const CURATORS={0:'HfMgvo7Lfuymg9sxii2H747rXdts5be6UfLPp6kXS4cNE9u',
+                1:'HyfBoVzPkikGdDv5P9pNoMkHrQJ5LvktdXwiv9RntbrTHi4',
+                2:'DVYbCSWbNfNxA2DXK1TUJSUaBYZVyeVq6AEvmp98S2nn3LH'};
+/* Fill runbook placeholders with the bounty and child actually selected, and mark
+   them so it is obvious which values are contextual rather than part of the text. */
+function subst(html){
+  const m=META[active];
+  const mark=v=>'<span class="fill">'+v+'</span>';
+  const cur = sel===null?null:(kids.get(m.id)||[]).find(c=>c.id===sel);
+  const pairs=[
+    ['BOUNTY_ID',        String(m.id)],
+    ['CHILD_ID',         sel===null?null:String(sel)],
+    ['CHILD_VALUE',      cur?cur.value.toLocaleString():null],
+    ['CHILD_METADATA',   cur?'0x'+cur.meta:null],
+    ['CURATOR_ACCOUNT',  CURATORS[m.id]],
+    ['CURATOR_MULTISIG', m.ms],
+  ];
+  for(const [k,v] of pairs){
+    if(v===null) continue;
+    html=html.split('&lt;'+k+'&gt;').join(mark(v)).split('<'+k+'>').join(mark(v));
+  }
+  // values the curator supplies rather than reads — never auto-filled
+  const you='<span class="you">you supply this</span>';
+  html=html.split('&lt;PREIMAGE_HASH&gt;').join(you).split('<PREIMAGE_HASH>').join(you);
+  return html;
+}
+
+function renderDoc(){
+  const sec=SECTIONS[step]; if(!sec){$('doc').innerHTML='<p>Not found.</p>';return}
+  let extra='';
+  if(BUILDERS[step]){
+    extra=`<div class="builder"><h3>Build the call for this step</h3><div class="brow">
+      <div><label for="act">Call</label><select id="act">`+
+      BUILDERS[step].map(([i,n])=>`<option value="${i}">${n}</option>`).join('')+
+      `</select></div>
+      <div id="childWrap"><label for="child">Child id <span style="text-transform:none;letter-spacing:0">(blank = parent)</span></label>
+        <input id="child" type="number" min="0" step="1"></div>
+      <div id="amtWrap"><label for="ivamt">Amount to add (DOT)</label>
+        <input id="ivamt" type="number" min="0" step="any" placeholder="3999"></div>
+      </div><div id="callout">Choose a call.</div></div>`;
+  } else if(NOVA[step]){
+    extra=`<div class="nobuild"><strong style="color:var(--amber)">Not built here.</strong> ${NOVA[step]}</div>`;
+  }
+  $('doc').innerHTML=`<span class="h1x">${sec.title}</span>`+extra+subst(sec.html)+
+    `<p style="margin-top:22px;font-size:12.5px;color:var(--tx3)">`+
+    `Values shown <span class="fill">like this</span> are live from chain for `+
+    `<strong>${META[active].name}</strong>`+(sel===null?'':` · child #${sel}`)+
+    `. Amber marks values you supply yourself. Unfilled placeholders mean nothing is selected yet.</p>`;
+  if(BUILDERS[step]){
+    ['act','child','ivamt'].forEach(i=>$(i)&&$(i).addEventListener('input',buildCall));
+    $('act').addEventListener('change',buildCall);
+    if(sel!==null&&$('child')) $('child').value=sel;
+    buildCall();
+  }
+}
+function buildCall(){
+  const idx=+$('act').value, m=META[active], isIV=idx===9, out=$('callout');
+  $('amtWrap').style.display=isIV?'':'none';
+  $('childWrap').style.display=isIV?'none':'';
+  try{
+    let bytes,argText,name=(BUILDERS[step].find(b=>b[0]===idx)||[,'?'])[1];
+    if(isIV){
+      const raw=$('ivamt').value.trim();
+      if(!raw){out.textContent='Enter an amount to add.';return}
+      const pl=BigInt(Math.round(parseFloat(raw)*1e10));
+      if(pl<=0n){out.textContent='Amount must be greater than zero.';return}
+      bytes=[PALLET,idx,...compact(m.id),...compact(pl)];
+      argText=`parent_bounty_id: ${m.id}, amount: ${pl} planck (${fmt(pl)} DOT)`;
+    }else{
+      const c=$('child').value.trim(), child=c===''?null:parseInt(c,10);
+      bytes=[PALLET,idx,...compact(m.id),...optU32(child)];
+      argText=`parent_bounty_id: ${m.id}, child_bounty_id: ${child===null?'None':'Some('+child+')'}`;
+    }
+    out.innerHTML=`<strong style="color:var(--tx)">multiAssetBounties.${name}</strong>`+
+      `<div class="mono" style="font-size:12.5px;margin-top:5px">${argText}</div>`+
+      `<code class="callhex">${toHex(bytes)}</code><button class="copy" id="cp">Copy call data</button>`+
+      `<div class="verify">Before signing: decode this in Polkadot.js → Developer → Extrinsics → Decode `+
+      `and confirm it matches the call and arguments above. Then wrap it as `+
+      `multisig → proxy.proxy (Governance) → this call.</div>`;
+    $('cp').onclick=()=>{navigator.clipboard.writeText(toHex(bytes));
+      $('cp').textContent='Copied';setTimeout(()=>$('cp').textContent='Copy call data',1400)};
+  }catch(e){out.textContent='Could not encode: '+e.message}
+}
+function render(){
+  const m=META[active], b=bounties.get(m.id);
+  const pot=balances.get(derive('mbt',m.id))||0n, val=b?b.value:0n;
+  $('pot').innerHTML=fmt(pot)+'<small>DOT</small>';
+  $('val').innerHTML=fmt(val)+'<small>DOT</small>';
+  $('head').innerHTML=fmt(pot>val?pot-val:0n)+'<small>DOT</small>';
+  renderKids(); renderRail(); renderDoc(); renderRefs();
+}
+
+/* ── boot ───────────────────────────────────────────────────────────────── */
+$('tabs').innerHTML=META.map((b,i)=>
+  `<button class="tab" role="tab" data-i="${i}" aria-selected="${i===0}">${b.name}</button>`).join('');
+$('tabs').onclick=e=>{const t=e.target.closest('.tab');if(!t)return;
+  active=+t.dataset.i;sel=null;step='pre';
+  [...$('tabs').children].forEach((x,i)=>x.setAttribute('aria-selected',i===active));render()};
+$('kids').addEventListener('click',e=>{const k=e.target.closest('.kid');if(!k)return;
+  if(k.dataset.c==='new'){sel=null;step='pre'}
+  else{sel=+k.dataset.c;
+    const c=(kids.get(META[active].id)||[]).find(x=>x.id===sel);
+    if(c) step=(STATUS[c.status]||{step:'pre'}).step}
+  render()});
+$('rail').addEventListener('click',e=>{const r=e.target.closest('.rl');if(!r)return;
+  step=r.dataset.s;renderRail();renderDoc()});
+
+function renderRefs(){
+  $('roles').innerHTML=SECTIONS.roles?subst(SECTIONS.roles.html):'';
+  $('issues').innerHTML=SECTIONS.issues?subst(SECTIONS.issues.html):'';
+}
+
+(async()=>{
+  try{
+    setBusy('connecting');
+    await connect();
+    setBusy('reading chain');
+    const chain=await rpc('system_chain'), head=await rpc('chain_getHeader');
+    await loadAll(setBusy);
+    setConn(true,`${chain} · #${parseInt(head.number,16).toLocaleString()}`);
+    render();
+  }catch(e){ setConn(false,'error: '+e.message);
+    $('doc').innerHTML=`<p style="color:var(--red)">${e.message}</p>`+(SECTIONS.pre?SECTIONS.pre.html:''); }
+})();
+</script>
+</body>
+</html>

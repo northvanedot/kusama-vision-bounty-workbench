@@ -1,0 +1,460 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kusama Vision Bounty Workbench</title>
+<style>
+:root{
+  --f-body:'Segoe UI','SF Pro Text',-apple-system,BlinkMacSystemFont,sans-serif;
+  --f-disp:'SF Pro Display','Segoe UI',-apple-system,sans-serif;
+  --f-mono:ui-monospace,SFMono-Regular,'SF Mono',Menlo,Consolas,monospace;
+  --bg:#0a0a0a; --card:#141414; --inset:#191919;
+  --blue:#6e9fff; --cyan:#5ce0d6; --amber:#d9a441; --red:#e06c75;
+  --tx:#eef0f4; --tx2:#8a8a8a; --tx3:#555; --bd:#222;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--f-body);font-size:15px;
+  line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1240px;margin:0 auto;padding:36px 20px 90px}
+.mono{font-family:var(--f-mono)}
+a{color:var(--blue)}
+
+header{display:flex;align-items:flex-start;gap:20px;flex-wrap:wrap;padding-bottom:20px;
+  border-bottom:1px solid var(--bd);margin-bottom:22px}
+h1{font-family:var(--f-disp);font-size:28px;font-weight:800;letter-spacing:-.02em;margin:0 0 5px}
+.sub{color:var(--tx2);margin:0;font-size:14.5px}
+#conn{margin-left:auto;font-family:var(--f-mono);font-size:12.5px;color:var(--tx2);white-space:nowrap}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--tx3);margin-right:6px}
+.dot.ok{background:var(--cyan)} .dot.bad{background:var(--red)}
+.dot.busy{background:var(--amber);animation:pulse 1s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.dot.busy{animation:none}}
+.skel{height:12px;border-radius:6px;background:linear-gradient(90deg,#1a1a1a,#242424,#1a1a1a);
+  background-size:200% 100%;animation:sh 1.3s linear infinite;margin:9px 0}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@media(prefers-reduced-motion:reduce){.skel{animation:none}}
+
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.tab{font-family:var(--f-disp);font-size:13.5px;font-weight:600;padding:8px 15px;border-radius:20px;
+  border:1px solid var(--bd);background:var(--card);color:var(--tx2);cursor:pointer}
+.tab[aria-selected="true"]{border-color:var(--blue);color:var(--blue)}
+.tab:focus-visible,button:focus-visible,select:focus-visible,input:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}
+
+.stats{display:grid;gap:14px;margin-bottom:20px}
+@media(min-width:700px){.stats{grid-template-columns:repeat(3,1fr)}}
+.stat{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:16px 18px}
+.stat .k{font-family:var(--f-disp);font-size:10px;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--tx3);margin-bottom:4px}
+.stat .v{font-family:var(--f-disp);font-size:22px;font-weight:700;font-variant-numeric:tabular-nums}
+.stat .v small{font-size:12px;font-weight:500;color:var(--tx2);margin-left:4px}
+
+.cols{display:grid;gap:20px}
+@media(min-width:960px){.cols{grid-template-columns:290px 1fr;align-items:start}}
+
+.panel{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:18px 20px;margin-bottom:16px}
+.panel h2{font-family:var(--f-disp);font-size:12px;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--tx3);margin:0 0 12px}
+
+.kid{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:9px 11px;
+  border-radius:9px;border:1px solid transparent;background:none;color:var(--tx);cursor:pointer;font-size:14px}
+.kid:hover{background:var(--inset)}
+.kid[aria-current="true"]{border-color:var(--blue);background:rgba(110,159,255,.08)}
+.kid .id{font-family:var(--f-mono);font-size:12px;color:var(--tx3);min-width:22px}
+.kid .amt{margin-left:auto;font-variant-numeric:tabular-nums;font-size:13px;color:var(--tx2)}
+.pill{display:inline-block;font-family:var(--f-disp);font-size:10.5px;font-weight:600;padding:2px 9px;
+  border-radius:20px;border:1px solid var(--bd);color:var(--tx2);white-space:nowrap}
+.pill.blue{border-color:rgba(110,159,255,.4);color:var(--blue)}
+.pill.cyan{border-color:rgba(92,224,214,.4);color:var(--cyan)}
+.pill.amber{border-color:rgba(217,164,65,.4);color:var(--amber)}
+
+.rail{display:flex;flex-direction:column;gap:3px}
+.rl{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:9px;border:1px solid transparent;
+  background:none;color:var(--tx2);cursor:pointer;font-size:14px;text-align:left;width:100%}
+.rl:hover{background:var(--inset);color:var(--tx)}
+.rl[aria-current="true"]{border-color:var(--blue);background:rgba(110,159,255,.08);color:var(--tx)}
+.rl .n{font-family:var(--f-mono);font-size:11px;color:var(--tx3);min-width:20px}
+.rl.here .n{color:var(--cyan)}
+.rl .here-tag{margin-left:auto;font-family:var(--f-disp);font-size:9.5px;font-weight:700;
+  letter-spacing:.1em;color:var(--cyan)}
+
+.doc{background:var(--card);border:1px solid var(--bd);border-radius:14px;padding:26px 30px}
+.doc h1x{font-family:var(--f-disp);font-size:21px;font-weight:700;margin:0 0 18px;display:block}
+.doc h3{font-family:var(--f-disp);font-size:16px;font-weight:700;margin:26px 0 8px}
+.doc h4{font-family:var(--f-disp);font-size:13.5px;font-weight:700;margin:20px 0 6px;color:var(--tx2)}
+.doc p{margin:0 0 12px}
+.doc ul,.doc ol{margin:0 0 12px;padding-left:22px}
+.doc li{margin-bottom:5px}
+.doc code{font-family:var(--f-mono);font-size:.87em;background:var(--inset);padding:2px 6px;
+  border-radius:5px;border:1px solid var(--bd);color:var(--cyan)}
+.doc pre{background:#0c0c0c;border:1px solid var(--bd);border-radius:9px;padding:13px 15px;
+  overflow-x:auto;margin:0 0 14px}
+.doc pre code{background:none;border:none;padding:0;color:var(--tx2);font-size:12.5px;line-height:1.55}
+.doc blockquote{margin:0 0 14px;padding:11px 15px;border-left:3px solid var(--amber);
+  background:rgba(217,164,65,.06);border-radius:0 8px 8px 0;color:var(--tx2)}
+.doc table{width:100%;border-collapse:collapse;font-size:13.5px;margin:0 0 14px;display:block;overflow-x:auto}
+.doc th{font-family:var(--f-disp);font-size:10px;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--tx3);text-align:left;padding:0 12px 7px 0;border-bottom:1px solid var(--bd);white-space:nowrap}
+.doc td{padding:7px 12px 7px 0;border-bottom:1px solid var(--bd);vertical-align:top}
+.doc hr{border:none;border-top:1px solid var(--bd);margin:22px 0}
+
+.you{background:rgba(217,164,65,.12);border-bottom:1px solid rgba(217,164,65,.45);
+  padding:1px 4px;border-radius:3px;color:var(--amber);font-family:var(--f-disp);
+  font-size:.85em;font-weight:600;letter-spacing:.04em}
+.fill{background:rgba(92,224,214,.13);border-bottom:1px solid rgba(92,224,214,.45);
+  padding:1px 4px;border-radius:3px;color:var(--cyan);font-family:var(--f-mono);font-size:.95em}
+.doc pre .fill{font-size:1em}
+.builder{margin:22px 0 6px;border:1px solid rgba(110,159,255,.3);border-radius:12px;
+  padding:18px 20px;background:rgba(110,159,255,.04)}
+.builder h3{margin:0 0 14px;font-size:15px;color:var(--blue)}
+.brow{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-end}
+.builder label{display:block;font-family:var(--f-disp);font-size:10px;font-weight:600;
+  letter-spacing:.13em;text-transform:uppercase;color:var(--tx3);margin-bottom:6px}
+.builder select,.builder input{font-family:var(--f-mono);font-size:14px;padding:9px 12px;
+  background:var(--inset);border:1px solid var(--bd);border-radius:8px;color:var(--tx)}
+.builder select{min-width:230px} .builder input{width:140px}
+#callout{margin-top:16px;border-radius:9px;padding:14px 16px;border:1px solid var(--bd);
+  background:var(--inset);font-size:14px;color:var(--tx2)}
+.callhex{display:block;font-family:var(--f-mono);font-size:12.5px;color:var(--cyan);background:#0007;
+  padding:11px 13px;border-radius:8px;margin:9px 0;word-break:break-all;line-height:1.5}
+.copy{font-family:var(--f-disp);font-size:12px;font-weight:600;padding:6px 14px;border-radius:16px;
+  border:1px solid var(--bd);background:var(--card);color:var(--tx2);cursor:pointer}
+.copy:hover{color:var(--blue);border-color:var(--blue)}
+.verify{margin-top:11px;font-size:12.5px;color:var(--amber)}
+.nobuild{margin:22px 0 6px;border:1px solid rgba(217,164,65,.28);border-radius:12px;padding:15px 18px;
+  background:rgba(217,164,65,.05);font-size:13.5px;color:var(--tx2)}
+
+details.ref{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:0;margin-top:14px}
+details.ref summary{font-family:var(--f-disp);font-size:13px;font-weight:600;padding:14px 20px;cursor:pointer;color:var(--tx2)}
+details.ref summary:hover{color:var(--tx)}
+details.ref .doc{border:none;border-radius:0;padding:0 30px 22px}
+footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--bd);font-size:12.5px;color:var(--tx3)}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <h1>Kusama Vision Bounty Workbench</h1>
+    <p class="sub">Live chain state and the runbook, side by side. Reads only — it never signs.</p>
+  </div>
+  <div id="conn"><span class="dot"></span>connecting…</div>
+</header>
+
+<div class="tabs" role="tablist" id="tabs"></div>
+
+<div class="stats">
+  <div class="stat"><div class="k">Pot balance</div><div class="v" id="pot"><span class="skel" style="display:inline-block;width:110px;height:20px;vertical-align:middle"></span></div></div>
+  <div class="stat"><div class="k">Recorded value</div><div class="v" id="val">—</div></div>
+  <div class="stat"><div class="k">Headroom</div><div class="v" id="head">—</div></div>
+</div>
+
+<div class="cols">
+  <div>
+    <div class="panel">
+      <h2>Child bounties</h2>
+      <div id="kids"><div class="skel" style="width:88%"></div><div class="skel" style="width:70%"></div><div class="skel" style="width:80%"></div></div>
+    </div>
+    <div class="panel">
+      <h2>Runbook</h2>
+      <div class="rail" id="rail"></div>
+    </div>
+  </div>
+
+  <div>
+    <div class="doc" id="doc"><div class="skel" style="width:45%;height:18px"></div>
+      <div class="skel"></div><div class="skel" style="width:92%"></div><div class="skel" style="width:76%"></div></div>
+    <details class="ref"><summary>Roles and terminology</summary><div class="doc" id="roles"></div></details>
+    <details class="ref"><summary>Common issues and notes</summary><div class="doc" id="issues"></div></details>
+  </div>
+</div>
+
+<footer>Kusama Asset Hub · <span class="mono">multiAssetBounties</span> (pallet 98) ·
+  call data verified against <span class="mono">@polkadot/api</span> · no keys, no signing</footer>
+</div>
+
+<script>
+const SECTIONS = {"roles": {"title": "Roles and Terminology", "html": "<h3>Bounty parameters</h3><p>Every step below is written against these three names. Pick the bounty you are working on and read its column; the workbench fills them in automatically for whichever bounty and child you have selected.</p><table><thead><tr><th></th><th><code>0</code> — Proof of Personhood</th><th><code>1</code> — Art &amp; Social Experiments</th><th><code>2</code> — Zero-Knowledge &amp; Cryptography</th></tr></thead><tbody><tr><td><code>BOUNTY_ID</code></td><td><code>0</code></td><td><code>1</code></td><td><code>2</code></td></tr><tr><td><code>CURATOR_ACCOUNT</code></td><td><code>HfMgvo7Lfuymg9sxii2H747rXdts5be6UfLPp6kXS4cNE9u</code></td><td><code>HyfBoVzPkikGdDv5P9pNoMkHrQJ5LvktdXwiv9RntbrTHi4</code></td><td><code>DVYbCSWbNfNxA2DXK1TUJSUaBYZVyeVq6AEvmp98S2nn3LH</code></td></tr><tr><td><code>CURATOR_MULTISIG</code></td><td><code>FhDqdZBwWH16Auzttnc4hurJNVHNZYguMGPWxY2Bjzzxt6G</code></td><td><code>HNAgeYNFWJeNXBoe5Nf5KHLY5q2hp8X2UJNJjFGnrU8YYjw</code></td><td><code>D3LkMK27GeTV924MVcHJHDPwuHrk1jovzvAKKAoh3SJJHed</code></td></tr></tbody></table><p>Curator accounts read from <code>multiAssetBounties.bounties(BOUNTY_ID)</code>; multisigs read from <code>proxy.proxies(CURATOR_ACCOUNT)</code>, taking the delegate with proxy type <code>7</code> (Governance). Both queried on Kusama Asset Hub, 23 Aug 2026. Bounty 0&#x27;s entries match the values this document was originally written with, which is what validates the method for the other two.</p><p>Every curator account also carries a second delegate with proxy type <code>0</code> (Any): <code>EFuprYL5sShF5qao4F9hVRrkbutFeoAgn4HHehq4Rkx3ahm</code>. It is the same account across all three bounties and holds unrestricted authority over each curator account — worth knowing about, not something curators act through.</p><p>Where this document says a transaction can be submitted by a <strong>curator multisig signatory</strong>, it means any one of that bounty&#x27;s signatories can initiate or submit it. The operation still needs the bounty&#x27;s threshold in approvals before it executes.</p><h3>Governance proxy</h3><p>The curator multisig uses a <strong>Governance proxy</strong> to act on behalf of the parent curator/proxied account.</p><p>When this document says:</p><pre><code>curator multisig via Governance proxy</code></pre><p>it means the operation should be structured as:</p><pre><code>curator multisig\n  → proxy.proxy\n      real: &lt;CURATOR_ACCOUNT&gt;\n      force_proxy_type: Governance\n      call: &lt;nested call&gt;</code></pre><hr>"}, "pre": {"title": "Pre-check — Confirm Parent Bounty Status and Funds", "html": "<p>Before creating a child bounty, confirm the parent bounty exists, is active, uses the expected asset, and has enough allocated value.</p><p>For this flow, the parent bounty is:</p><pre><code>parent_bounty_id: &lt;BOUNTY_ID&gt;</code></pre><h3>Check parent bounty storage</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multiAssetBounties.bounties(&lt;BOUNTY_ID&gt;)</code></pre><p>Expected parent bounty state:</p><pre><code>assetKind: DOT on Kusama Asset Hub\nvalue: &lt;current allocation — see note below&gt;\nstatus: Active\ncurator: &lt;CURATOR_ACCOUNT&gt;</code></pre><p><code>value</code> is the amount <strong>allocated to this parent bounty</strong>, not the pot balance. A freshly created bounty starts at <code>10,000,000,000</code> (1 DOT) and stays there until someone calls <code>increaseValue</code>. So a low <code>value</code> alongside a six-figure pot is the normal starting state, not a fault. Compare <code>value</code> against the child bounty you intend to create; if it is lower, run the <code>increaseValue</code> pre-check below first.</p><p>The parent bounty asset should show:</p><pre><code>assetKind:\n  V5:\n    location:\n      parents: 0\n      interior: Here\n    assetId:\n      parents: 2\n      interior:\n        X1:\n          GlobalConsensus: Polkadot</code></pre><p>This represents DOT as a foreign asset on Kusama Asset Hub.</p><h3>Confirm enough value</h3><p>The parent bounty value is:</p><pre><code>10,000,000,000</code></pre><p>For DOT with 10 decimals, this is:</p><pre><code>1 DOT</code></pre><p>The test child bounty value is:</p><pre><code>1,000,000,000</code></pre><p>For DOT with 10 decimals, this is:</p><pre><code>0.1 DOT</code></pre><p>So the parent bounty has enough allocated value for a <code>0.1 DOT</code> child bounty.</p><p>Do not create a child bounty if:</p><pre><code>- the parent bounty does not exist\n- the parent bounty is not Active\n- the asset is not the expected DOT asset\n- the parent bounty value is less than the intended child bounty value\n- the curator is not the expected parent curator/proxied account</code></pre><p>Note: a larger DOT balance in a pot or derived account does not necessarily mean it is spendable by a specific parent bounty. Treat the parent bounty <code>value</code> as the spendable allocation for that bounty.</p><hr>"}, "s0": {"title": "Step 0 — Increase the Parent Bounty Value", "html": "<p>Run this step when the parent bounty&#x27;s recorded <code>value</code> is lower than the child bounty you intend to create. Skip it when <code>value</code> already covers the amount.</p><p>This is the normal path after a monthly top-up: DOT arriving in the bounty account does not raise <code>value</code> on its own. The runtime documentation is explicit that the call exists to &quot;register funds that were transferred into the bounty account out-of-band (e.g. recurring external top-ups), so they become available to award or to allocate to child bounties.&quot;</p><h3>0.1 The call</h3><p>Verified against Kusama Asset Hub runtime metadata, 23 Aug 2026:</p><pre><code>multiAssetBounties.increase_value(\n  parent_bounty_id: BountyIndex,     // &lt;BOUNTY_ID&gt;\n  amount:           T::Balance       // the INCREMENT, not the new total\n)</code></pre><p><code>amount</code> is added to the existing <code>value</code>. It is not a new total. To take a bounty sitting at 1 DOT up to 4,000 DOT of headroom, pass <code>amount = 3,999 DOT</code> — or pass 4,000 and accept that <code>value</code> ends at 4,001.</p><p>DOT on Kusama Asset Hub has 10 decimals:</p><pre><code>1 DOT      = 10,000,000,000\n4,000 DOT  = 40,000,000,000,000</code></pre><h3>0.2 Before you call it</h3><p>Four things the runtime enforces or warns about:</p><pre><code>- Origin must be signed by the bounty curator.\n- The bounty must be in the Active state.\n- amount must be greater than 0.\n- value can only be increased, never decreased.</code></pre><p>Two consequences worth understanding before submitting:</p><p><strong>The curator pays an additional deposit.</strong> The curator deposit is re-evaluated against the new value and the difference is collected from the curator account. Confirm <code>&lt;CURATOR_ACCOUNT&gt;</code> holds enough free balance to cover it, or the call fails.</p><p><strong>The call does not check the bounty account actually holds the funds.</strong> It only updates the recorded number. You can raise <code>value</code> above the real balance and the failure will surface later, at award time, not here. Always check the pot balance covers the new value yourself — see the pre-check above.</p><p>Because the increase is irreversible, raise <code>value</code> by what the child bounty needs rather than by the whole pot.</p><h3>0.3 Who calls it, and how</h3><p>The origin must be the bounty curator, so this goes through the same proxy path as every other curator action:</p><pre><code>curator multisig\n  → proxy.proxy\n      real: &lt;CURATOR_ACCOUNT&gt;\n      force_proxy_type: Governance\n      call: multiAssetBounties.increase_value(&lt;BOUNTY_ID&gt;, amount)</code></pre><p>Initiate from any signatory; the operation needs the bounty&#x27;s threshold in approvals before it executes.</p><h3>0.4 Confirm it landed</h3><pre><code>multiAssetBounties.bounties(&lt;BOUNTY_ID&gt;)</code></pre><p>Check <code>value</code> has risen by <code>amount</code> and <code>status</code> is still <code>Active</code>. Only then continue to Step 1.</p><hr>"}, "s1": {"title": "Step 1 — Create and Register the Metadata Preimage", "html": "<p>Before creating a child bounty, create a metadata preimage on <strong>Kusama Asset Hub</strong>. The <code>metadata</code> field in <code>fundChildBounty</code> is an <code>H256</code> hash that points to an on-chain preimage.</p><p>The preimage must be created on <strong>Kusama Asset Hub</strong>, not the Kusama Relay Chain, because the <code>multiAssetBounties</code> pallet is running on Kusama Asset Hub.</p><h3>1.1 Create the metadata JSON</h3><p>Example metadata:</p><pre><code>{&quot;title&quot;:&quot;Test child bounty #2&quot;,&quot;description&quot;:&quot;Second test of the MultiAssetBounties child bounty flow using parent curator.&quot;,&quot;amount&quot;:&quot;0.1 DOT&quot;,&quot;parent_bounty_id&quot;:&lt;BOUNTY_ID&gt;,&quot;curator&quot;:&quot;parent&quot;}</code></pre><p>Keep the metadata simple and descriptive. Any change to spacing, punctuation, or text creates a different preimage hash.</p><h3>1.2 Submit the preimage</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Extrinsics</code></pre><p>Use:</p><pre><code>Pallet: preimage\nCall: notePreimage(bytes)\nSubmit from: any curator multisig signatory</code></pre><p>Paste the metadata JSON into the <code>bytes</code> field.</p><p>Use:</p><pre><code>Submit Transaction</code></pre><p>Do not use <code>Submit Unsigned</code>.</p><h3>1.3 Wait for finalization</h3><p>After submitting, wait until the transaction is:</p><pre><code>Finalized</code></pre><p>If it is only <code>Ready</code> or spinning, wait or check whether the wallet still needs approval.</p><h3>1.4 Confirm the preimage exists</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>preimage.preimageFor((H256, u32))</code></pre><p>For the example metadata above, use:</p><pre><code>H256:\n&lt;PREIMAGE_HASH&gt;\n\nu32:\n185</code></pre><p>Expected result:</p><pre><code>Some(0x...)</code></pre><p>or a returned bytes value.</p><p>If it returns:</p><pre><code>&lt;none&gt;</code></pre><p>the preimage is not stored on-chain and should not be used yet.</p><h3>1.5 Use the preimage hash as metadata</h3><p>Once confirmed, use the preimage hash as the <code>metadata</code> value in the child bounty creation call:</p><pre><code>metadata:\n&lt;PREIMAGE_HASH&gt;</code></pre><p>Important: do not use the <code>encoded call hash</code> from the <code>notePreimage</code> form. The metadata hash must be the actual preimage hash confirmed by <code>preimage.preimageFor</code>.</p><hr>"}, "s2": {"title": "Step 2 — Create/Fund the Child Bounty", "html": "<p>After the metadata preimage is confirmed on Kusama Asset Hub, create the child bounty using the curator multisig through the Governance proxy.</p><p>The curator multisig does <strong>not</strong> call <code>fundChildBounty</code> directly. The correct structure is:</p><pre><code>curator multisig\n  → proxy.proxy\n      → multiAssetBounties.fundChildBounty</code></pre><h3>2.1 Confirm the next child bounty ID</h3><p>Before creating a new child bounty, check how many child bounties already exist under the parent bounty.</p><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multiAssetBounties.totalChildBountiesPerParent(0)</code></pre><p>If the result is:</p><pre><code>1</code></pre><p>then the next child bounty will likely be:</p><pre><code>child_bounty_id: 1</code></pre><h3>2.2 Start the multisig operation in Nova Spektr</h3><p>In Nova Spektr, create a new multisig operation.</p><p>Use:</p><pre><code>Network: Kusama Asset Hub\nSubmit from: PoP Bounty Team Kusama Vision multisig\nInitiator: any curator multisig signatory</code></pre><h3>2.3 Build the outer proxy call</h3><p>Select:</p><pre><code>Pallet: proxy\nCall: proxy</code></pre><p>Set:</p><pre><code>real:\n&lt;CURATOR_ACCOUNT&gt;\n\nforce_proxy_type:\nGovernance</code></pre><p>This means the curator multisig is acting through its Governance proxy over the parent bounty curator/proxied account.</p><h3>2.4 Build the nested child bounty call</h3><p>Inside the <code>call</code> field of <code>proxy.proxy</code>, select:</p><pre><code>Pallet: multiAssetBounties\nCall: fundChildBounty</code></pre><p>Use:</p><pre><code>parent_bounty_id: &lt;BOUNTY_ID&gt;\nvalue: &lt;CHILD_VALUE&gt;\nmetadata: &lt;CHILD_METADATA&gt;\ncurator: null</code></pre><p>The value:</p><pre><code>1,000,000,000</code></pre><p>represents <code>0.1 DOT</code> for the DOT asset, assuming 10 decimals.</p><p>In some UIs, the balance field may display as:</p><pre><code>0.001 KSM</code></pre><p>That is acceptable only if the operation preview shows the raw value as:</p><pre><code>&quot;value&quot;: &quot;&lt;CHILD_VALUE&gt;&quot;</code></pre><p>Do not submit if the preview shows:</p><pre><code>&quot;value&quot;: &quot;0&quot;</code></pre><p>or a much larger value.</p><h3>2.5 Use parent curator to reduce steps</h3><p>Set:</p><pre><code>curator: null</code></pre><p>This makes the child bounty use the parent curator by default.</p><p>That reduces the flow because the child bounty should move from:</p><pre><code>FundingAttempted → Active</code></pre><p>after <code>checkStatus</code>.</p><p>If a separate curator is assigned, the flow would be:</p><pre><code>FundingAttempted → Funded → acceptCurator → Active</code></pre><h3>2.6 Review the operation preview</h3><p>The operation should look like this:</p><pre><code>{\n  &quot;method&quot;: &quot;proxy&quot;,\n  &quot;section&quot;: &quot;proxy&quot;,\n  &quot;args&quot;: {\n    &quot;real&quot;: &quot;&lt;CURATOR_ACCOUNT&gt;&quot;,\n    &quot;force_proxy_type&quot;: &quot;Governance&quot;,\n    &quot;call&quot;: {\n      &quot;method&quot;: &quot;fundChildBounty&quot;,\n      &quot;section&quot;: &quot;multiAssetBounties&quot;,\n      &quot;args&quot;: {\n        &quot;parent_bounty_id&quot;: &quot;&lt;BOUNTY_ID&gt;&quot;,\n        &quot;value&quot;: &quot;&lt;CHILD_VALUE&gt;&quot;,\n        &quot;metadata&quot;: &quot;&lt;PREIMAGE_HASH&gt;&quot;,\n        &quot;curator&quot;: null\n      }\n    }\n  }\n}</code></pre><p>Do not submit if:</p><pre><code>force_proxy_type: null</code></pre><p>It must be:</p><pre><code>force_proxy_type: Governance</code></pre><h3>2.7 Submit and collect approvals</h3><p>Submit the operation from any curator multisig signatory.</p><p>After one signatory submits, the operation shows a partial signature count. The remaining signatories must approve before the operation executes — how many depends on this bounty&#x27;s multisig threshold, which the signing UI displays.</p><h3>2.8 Confirm the child bounty was created</h3><p>After the multisig reaches the threshold and executes, go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multiAssetBounties.totalChildBountiesPerParent(0)</code></pre><p>Expected result:</p><pre><code>2</code></pre><p>Then query:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>Expected result:</p><pre><code>parentBounty: &lt;BOUNTY_ID&gt;\nvalue: &lt;CHILD_VALUE&gt;\nmetadata: &lt;CHILD_METADATA&gt;\nstatus: FundingAttempted\ncurator: &lt;CURATOR_ACCOUNT&gt;</code></pre><p>This confirms the child bounty was created successfully and is ready for the funding status check.</p><hr>"}, "s3": {"title": "Step 3 — Check Funding Status", "html": "<p>After the multisig operation executes and the child bounty is created, the child bounty will usually start in this state:</p><pre><code>FundingAttempted</code></pre><p>This means the bounty record exists and the payment/funding attempt has been initiated, but the funding status has not yet been finalized.</p><h3>3.1 Confirm the child bounty state</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>Expected result before checking status:</p><pre><code>parentBounty: &lt;BOUNTY_ID&gt;\nvalue: &lt;CHILD_VALUE&gt;\nmetadata: &lt;CHILD_METADATA&gt;\nstatus: FundingAttempted</code></pre><h3>3.2 Run checkStatus</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Extrinsics</code></pre><p>Use:</p><pre><code>Pallet: multiAssetBounties\nCall: checkStatus</code></pre><p>Set:</p><pre><code>parentBountyId: &lt;BOUNTY_ID&gt;\nchildBountyId: Some(1)</code></pre><p>Then submit the transaction from any curator multisig signatory.</p><p>This call does not need to be submitted through the curator multisig. It can be submitted by any signed account.</p><h3>3.3 Confirm the updated state</h3><p>After <code>checkStatus</code> finalizes, query again:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>Expected result:</p><pre><code>status: Active\ncurator: &lt;CURATOR_ACCOUNT&gt;</code></pre><h3>3.4 Why it becomes Active</h3><p>Because the child bounty was created with:</p><pre><code>curator: null</code></pre><p>it uses the parent curator:</p><pre><code>&lt;CURATOR_ACCOUNT&gt;</code></pre><p>That means the flow skips the separate curator acceptance step.</p><p>The expected transition is:</p><pre><code>FundingAttempted → Active</code></pre><p>If a separate curator had been assigned, the transition would usually be:</p><pre><code>FundingAttempted → Funded → acceptCurator → Active</code></pre><hr>"}, "s4": {"title": "Step 4 — Award the Child Bounty to the Beneficiary", "html": "<p>After the child bounty is <code>Active</code>, it can be awarded to a beneficiary.</p><p>For this test, the active child bounty is:</p><pre><code>parent_bounty_id: &lt;BOUNTY_ID&gt;\nchild_bounty_id: 1\nvalue: &lt;CHILD_VALUE&gt;\nstatus: Active\ncurator: &lt;CURATOR_ACCOUNT&gt;</code></pre><p>Because the curator is the proxied parent curator account, the award must be executed through the curator multisig using the Governance proxy.</p><p>The correct structure is:</p><pre><code>curator multisig\n  → proxy.proxy\n      → multiAssetBounties.awardBounty</code></pre><h3>4.1 Beneficiary account</h3><p>The beneficiary provided this Kusama/Asset Hub address:</p><pre><code>FfDhYNF9pStknnmRKuipNSgpjeknhin45GKjHejFArjnKZt</code></pre><p>This decodes to the following 32-byte account ID:</p><pre><code>0x8871579fd0c679ace59d1e62cda57c339ed883de8357a49f2a4dace411478327</code></pre><p>This is the value that must be used in the <code>AccountId32</code> field.</p><h3>4.2 Beneficiary existential deposit note</h3><p>DOT on Kusama Asset Hub is a sufficient foreign asset, so the beneficiary does not need an existing KSM existential deposit just to receive the DOT payout.</p><p>However, the beneficiary may still need fee-paying capability later to move or manage the received funds.</p><h3>4.3 Build the outer proxy call</h3><p>In Nova Spektr, create a new multisig operation.</p><p>Use:</p><pre><code>Network: Kusama Asset Hub\nSubmit from: PoP Bounty Team Kusama Vision multisig\nInitiator: any curator multisig signatory</code></pre><p>Select:</p><pre><code>Pallet: proxy\nCall: proxy</code></pre><p>Set:</p><pre><code>real:\n&lt;CURATOR_ACCOUNT&gt;\n\nforce_proxy_type:\nGovernance</code></pre><h3>4.4 Build the nested award call</h3><p>Inside the <code>call</code> field of <code>proxy.proxy</code>, select:</p><pre><code>Pallet: multiAssetBounties\nCall: awardBounty</code></pre><p>Set:</p><pre><code>parent_bounty_id: &lt;BOUNTY_ID&gt;\nchild_bounty_id: 1</code></pre><p>For the beneficiary, use:</p><pre><code>beneficiary: V5\n\nlocation:\n  parents: 0\n  interior: Here\n\naccountId:\n  parents: 0\n  interior: X1\n    AccountId32:\n      network: null\n      id: 0x8871579fd0c679ace59d1e62cda57c339ed883de8357a49f2a4dace411478327</code></pre><p>The <code>location: Here</code> means the payment is made on Kusama Asset Hub.</p><p>The <code>accountId</code> is the beneficiary account that will receive the payout.</p><h3>4.5 Nova/Spektr beneficiary encoding issue</h3><p>During testing, Nova/Spektr sometimes defaulted the beneficiary <code>AccountId32</code> to:</p><pre><code>0x0000000000000000000000000000000000000000000000000000000000000000</code></pre><p>or shifted the account ID to:</p><pre><code>0x0000008871579f...</code></pre><p>Do not submit the operation if the beneficiary is zero or shifted.</p><p>The correct beneficiary ID must start with:</p><pre><code>0x8871579f...</code></pre><p>and must be the full value:</p><pre><code>0x8871579fd0c679ace59d1e62cda57c339ed883de8357a49f2a4dace411478327</code></pre><h3>4.6 Correct raw call data</h3><p>The corrected proxy-wrapped award call data is:</p><pre><code>0x2a0000e104b438e7893a9f9cbc59e7d057d61a85ed1b88e3a0ebc59733cb89637a5e7c01076205000101000000050000000101008871579fd0c679ace59d1e62cda57c339ed883de8357a49f2a4dace411478327</code></pre><p>This decodes to:</p><pre><code>proxy.proxy\n  real: &lt;CURATOR_ACCOUNT&gt;\n  force_proxy_type: Governance\n  call:\n    multiAssetBounties.awardBounty\n      parent_bounty_id: &lt;BOUNTY_ID&gt;\n      child_bounty_id: 1\n      beneficiary:\n        V5\n          location: Here\n          accountId:\n            AccountId32\n              network: null\n              id: 0x8871579fd0c679ace59d1e62cda57c339ed883de8357a49f2a4dace411478327</code></pre><h3>4.7 Review before submitting</h3><p>Before submitting, confirm:</p><pre><code>method: proxy\nsection: proxy\nreal: &lt;CURATOR_ACCOUNT&gt;\nforce_proxy_type: Governance\nnested call: multiAssetBounties.awardBounty\nparent_bounty_id: &lt;BOUNTY_ID&gt;\nchild_bounty_id: 1\nbeneficiary id: 0x8871579f...8327</code></pre><p>Do not submit if:</p><pre><code>beneficiary id: 0x000000...</code></pre><p>or:</p><pre><code>beneficiary id: 0x000000887...</code></pre><h3>4.8 Submit and collect approvals</h3><p>Submit the operation from any curator multisig signatory.</p><p>After one signatory submits, the remaining signatories must approve before the operation executes — how many depends on this bounty&#x27;s multisig threshold, which the signing UI displays.</p><p>After execution, the child bounty status should move from:</p><pre><code>Active</code></pre><p>to something like:</p><pre><code>PayoutAttempted</code></pre><hr>"}, "s5": {"title": "Step 5 — Confirm Award Execution and Finalize Payout", "html": "<p>After the <code>awardBounty</code> multisig operation is submitted, it must receive enough approvals before execution.</p><p>The award operation follows this structure:</p><pre><code>curator multisig\n  → proxy.proxy\n      → multiAssetBounties.awardBounty</code></pre><p>Once the multisig reaches the threshold, the award call executes and the child bounty should move from:</p><pre><code>Active</code></pre><p>to:</p><pre><code>PayoutAttempted</code></pre><h3>5.1 Check the pending multisig operation</h3><p>To check the pending multisig in Polkadot.js, go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multisig.multisigs(AccountId32, [u8;32])</code></pre><p>Use:</p><pre><code>AccountId32:\n&lt;CURATOR_MULTISIG&gt;</code></pre><p>This is the curator multisig account.</p><p>For the call hash, use the award call hash from Nova/Spektr or Polkadot.js decode.</p><p>Leave the optional block hash field blank.</p><p>Expected result while pending:</p><pre><code>Some(...)</code></pre><p>The result should show details such as the depositor, deposit, timepoint, and approvals.</p><p>If the result is:</p><pre><code>None</code></pre><p>then one of these may be true:</p><pre><code>- the call hash is incorrect\n- the operation already executed\n- the operation failed or was removed\n- the wrong network is selected</code></pre><h3>5.2 Confirm the child bounty status</h3><p>After the multisig reaches threshold and executes, check the child bounty state.</p><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>Expected result after successful award:</p><pre><code>status: PayoutAttempted</code></pre><p>This means the award call executed and the payout process has started.</p><h3>5.3 Finalize/check the payout</h3><p>Once the child bounty shows <code>PayoutAttempted</code>, submit:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Extrinsics</code></pre><p>Use:</p><pre><code>Pallet: multiAssetBounties\nCall: checkStatus</code></pre><p>Set:</p><pre><code>parentBountyId: &lt;BOUNTY_ID&gt;\nchildBountyId: Some(1)</code></pre><p>This does not need to go through the curator multisig. It can be submitted by any curator multisig signatory.</p><h3>5.4 Confirm final state</h3><p>After <code>checkStatus</code> finalizes, query again:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>If the payout succeeded, the child bounty may be removed from storage.</p><p>Possible final results:</p><pre><code>None / no child bounty found</code></pre><p>or a state showing the payout has completed.</p><p>If the bounty still shows:</p><pre><code>PayoutAttempted</code></pre><p>then the payout may still need another status check or further review.</p><h3>5.5 Confirm beneficiary received funds</h3><p>Check the beneficiary account on Kusama Asset Hub:</p><pre><code>FfDhYNF9pStknnmRKuipNSgpjeknhin45GKjHejFArjnKZt</code></pre><p>Underlying AccountId32:</p><pre><code>0x8871579fd0c679ace59d1e62cda57c339ed883de8357a49f2a4dace411478327</code></pre><p>Confirm the beneficiary received the expected payout amount:</p><pre><code>0.1 DOT</code></pre><p>on Kusama Asset Hub.</p><hr>"}, "issues": {"title": "Common Issues and Notes", "html": "<h3>Priority is too low</h3><p>If a transaction fails with:</p><pre><code>1014: Priority is too low</code></pre><p>there is likely another transaction from the same signer with the same nonce still in the transaction pool.</p><p>Wait a few minutes, refresh the app/wallet, and check whether the earlier transaction finalized or dropped before submitting again.</p><h3>Preimage returns <code>&lt;none&gt;</code></h3><p>If <code>preimage.preimageFor(hash, length)</code> returns:</p><pre><code>&lt;none&gt;</code></pre><p>do not use that metadata hash yet. The preimage is not stored on-chain.</p><h3>Wrong network</h3><p>Always confirm the top-left network is:</p><pre><code>Kusama Asset Hub</code></pre><p>Do not accidentally use:</p><pre><code>Polkadot Asset Hub\nKusama Relay Chain\nPolkadot Relay Chain</code></pre><h3>Parent bounty value vs pot balance</h3><p>Use:</p><pre><code>multiAssetBounties.bounties(&lt;BOUNTY_ID&gt;)</code></pre><p>as the main source of truth for parent bounty allocation/status.</p><p>A separate pot or derived account may hold more DOT, but that does not automatically mean a specific parent bounty can spend it.</p>"}};
+
+const RPC='wss://kusama-asset-hub-rpc.polkadot.io';
+const FA='0x30e64a56026f4b5e3c2d196283a9a17db99d880ec681799c0cf30e8886371da997b69dec7cf3a4f83de9da212d99f0be02010902';
+const BOUNTIES='0x673607b30ff936734d4c021c4a99196aa37f719efab16103103a0c8c2c784ce1';
+const CHILDREN='0x673607b30ff936734d4c021c4a99196aedfb05b766f199ce00df85317e33050e';
+const META=[
+ {id:0,name:'Proof of Personhood',           ms:'FhDqdZBwWH16Auzttnc4hurJNVHNZYguMGPWxY2Bjzzxt6G'},
+ {id:1,name:'Art & Social Experiments',      ms:'HNAgeYNFWJeNXBoe5Nf5KHLY5q2hp8X2UJNJjFGnrU8YYjw'},
+ {id:2,name:'Zero-Knowledge & Cryptography', ms:'D3LkMK27GeTV924MVcHJHDPwuHrk1jovzvAKKAoh3SJJHed'},
+];
+const STATUS=[
+ {n:'Funding attempted',  c:'amber', step:'s3'},
+ {n:'Funded',             c:'blue',  step:'s3'},
+ {n:'Curator unassigned', c:'amber', step:'s3'},
+ {n:'Active',             c:'cyan',  step:'s4'},
+ {n:'Refund attempted',   c:'amber', step:'s5'},
+ {n:'Payout attempted',   c:'blue',  step:'s5'},
+];
+const RAIL=[['pre','Pre-check'],['s0','Step 0'],['s1','Step 1'],['s2','Step 2'],
+            ['s3','Step 3'],['s4','Step 4'],['s5','Step 5']];
+// calls offered per step; steps not listed need Nova (complex argument types)
+const BUILDERS={ s0:[[9,'increaseValue']], s3:[[7,'checkStatus'],[3,'acceptCurator'],[4,'unassignCurator']],
+                 s5:[[7,'checkStatus'],[8,'retryPayment'],[6,'closeBounty']] };
+const NOVA={ s1:'Preimage registration is done in Polkadot.js — it takes the raw metadata bytes, not a call this page builds.',
+             s2:'fundChildBounty takes H256 and Option&lt;MultiAddress&gt; arguments. Build it in Nova so the UI encodes them from metadata.',
+             s4:'awardBounty takes a VersionedLocatableAccount beneficiary — the exact argument this runbook documents an encoding bug for. Build it in Nova.' };
+
+/* ── xxhash64 → Twox64Concat ────────────────────────────────────────────── */
+const M=(1n<<64n)-1n,P1=11400714785074694791n,P2=14029467366897019727n,
+      P3=1609587929392839161n,P4=9650029242287828579n,P5=2870177450012600261n;
+const mu=(a,b)=>(a*b)&M,ad=(a,b)=>(a+b)&M,ro=(x,r)=>((x<<r)|(x>>(64n-r)))&M;
+const rn=(a,l)=>mu(ro(ad(a,mu(l,P2)),31n),P1), mg=(a,v)=>ad(mu(a^rn(0n,v),P1),P4);
+const u64=(b,i)=>{let v=0n;for(let k=7;k>=0;k--)v=(v<<8n)|BigInt(b[i+k]);return v};
+const u32b=(b,i)=>BigInt(b[i]|b[i+1]<<8|b[i+2]<<16|b[i+3]<<24)&0xffffffffn;
+function xx(inp,seed=0n){const len=inp.length;let i=0,acc;
+  if(len>=32){let a1=ad(ad(seed,P1),P2),a2=ad(seed,P2),a3=seed,a4=(seed-P1)&M;
+    for(;i<=len-32;i+=32){a1=rn(a1,u64(inp,i));a2=rn(a2,u64(inp,i+8));a3=rn(a3,u64(inp,i+16));a4=rn(a4,u64(inp,i+24));}
+    acc=ad(ad(ro(a1,1n),ro(a2,7n)),ad(ro(a3,12n),ro(a4,18n)));
+    acc=mg(acc,a1);acc=mg(acc,a2);acc=mg(acc,a3);acc=mg(acc,a4);} else acc=ad(seed,P5);
+  acc=ad(acc,BigInt(len));
+  for(;i<=len-8;i+=8) acc=ad(mu(ro(acc^rn(0n,u64(inp,i)),27n),P1),P4);
+  if(i<=len-4){acc=ad(mu(ro(acc^mu(u32b(inp,i),P1),23n),P2),P3);i+=4;}
+  for(;i<len;i++) acc=mu(ro(acc^mu(BigInt(inp[i]),P5),11n),P1);
+  acc=mu(acc^(acc>>33n),P2);acc=mu(acc^(acc>>29n),P3);return acc^(acc>>32n);}
+const hxs=b=>Array.from(b,x=>x.toString(16).padStart(2,'0')).join('');
+const le8=v=>{const o=new Uint8Array(8);let x=v;for(let i=0;i<8;i++){o[i]=Number(x&0xffn);x>>=8n}return o};
+const le=(n,w)=>{const o=new Uint8Array(w);let x=BigInt(n);for(let i=0;i<w;i++){o[i]=Number(x&0xffn);x>>=8n}return o};
+const t64c=b=>hxs(le8(xx(b,0n)))+hxs(b);
+function derive(tag,...ix){const a=new Uint8Array(32);let p=0;
+  for(const c of 'modlpy/trsry'+tag)a[p++]=c.charCodeAt(0);
+  for(const i of ix){a.set(le(i,4),p);p+=4}return hxs(a)}
+
+/* ── SCALE · verified byte-for-byte against @polkadot/api ───────────────── */
+function compact(v){v=BigInt(v);
+  if(v<0n)throw new Error('negative');
+  if(v<64n)return[Number(v)<<2];
+  if(v<16384n){const x=Number(v)<<2|1;return[x&0xff,x>>>8]}
+  if(v<1073741824n){const x=Number(v)*4+2;return[x&0xff,(x>>>8)&0xff,(x>>>16)&0xff,(x>>>24)&0xff]}
+  const b=[];let x=v;while(x>0n){b.push(Number(x&0xffn));x>>=8n}
+  return[((b.length-4)<<2)|3,...b]}
+const optU32=v=>(v===null||v===undefined||v==='')?[0]:[1,v&0xff,(v>>>8)&0xff,(v>>>16)&0xff,(v>>>24)&0xff];
+const PALLET=0x62;
+const toHex=a=>'0x'+a.map(b=>b.toString(16).padStart(2,'0')).join('');
+
+/* ── RPC ────────────────────────────────────────────────────────────────── */
+let ws,seq=0;const waiting=new Map();
+const rpc=(m,p=[])=>new Promise((res,rej)=>{const id=++seq;waiting.set(id,{res,rej});
+  ws.send(JSON.stringify({jsonrpc:'2.0',id,method:m,params:p}));
+  setTimeout(()=>{if(waiting.delete(id))rej(new Error('timeout: '+m))},20000)});
+const connect=()=>new Promise((res,rej)=>{ws=new WebSocket(RPC);
+  ws.onmessage=e=>{const m=JSON.parse(e.data),w=waiting.get(m.id);
+    if(w){waiting.delete(m.id);m.error?w.rej(new Error(m.error.message)):w.res(m.result)}};
+  ws.onopen=res;ws.onerror=()=>rej(new Error('connection failed'));
+  ws.onclose=()=>setConn(false,'disconnected')});
+const $=id=>document.getElementById(id);
+const setConn=(ok,t)=>$('conn').innerHTML='<span class="dot '+(ok?'ok':'bad')+'"></span>'+t;
+const setBusy=t=>$('conn').innerHTML='<span class="dot busy"></span>'+t+'…';
+const fmt=p=>(Number(p)/1e10).toLocaleString(undefined,{maximumFractionDigits:4});
+
+/* ── state ──────────────────────────────────────────────────────────────── */
+let balances=new Map(), bounties=new Map(), kids=new Map();
+let active=0, sel=null, step='pre';
+
+async function loadAll(prog){
+  const batch = async keys => {                    // one round-trip for many keys
+    if(!keys.length) return new Map();
+    const r = await rpc('state_queryStorageAt',[keys]);
+    const m = new Map();
+    for(const ch of (r[0]?.changes||[])) if(ch[1]!==null) m.set(ch[0],ch[1]);
+    return m;
+  };
+  const pageKeys = async pre => {
+    let out=[], last=pre;
+    for(;;){ const pg=await rpc('state_getKeysPaged',[pre,500,last]);
+      if(!pg.length) break; out=out.concat(pg); last=pg[pg.length-1];
+      if(pg.length<500) break; }
+    return out;
+  };
+
+  prog('reading balances');
+  const faKeys = await pageKeys(FA);
+  const faVals = await batch(faKeys);
+  for(const [k,raw] of faVals){
+    const h=raw.slice(2); let v=0n;
+    for(let i=15;i>=0;i--) v=(v<<8n)|BigInt(parseInt(h.substr(i*2,2),16));
+    balances.set(k.slice(-64),v);
+  }
+
+  prog('reading bounties');
+  const bKeys=META.map(b=>BOUNTIES+t64c(le(b.id,4)));
+  const bVals=await batch(bKeys);
+  META.forEach((b,i)=>{
+    const raw=bVals.get(bKeys[i]);
+    if(!raw){ bounties.set(b.id,null); return }
+    const h=raw.slice(2); let v=0n;
+    for(let j=15;j>=0;j--) v=(v<<8n)|BigInt(parseInt(h.substr((7+j)*2,2),16));
+    bounties.set(b.id,{value:v,curator:h.slice(-64)});
+  });
+
+  prog('reading child bounties');
+  const rdU32=(h,i)=>parseInt(h.substr(i*2,8).match(/../g).reverse().join(''),16);
+  const rdU128=(h,i)=>BigInt('0x'+h.substr(i*2,32).match(/../g).reverse().join(''));
+  const cKeys=await pageKeys(CHILDREN);
+  const cVals=await batch(cKeys);
+  for(const k of cKeys){
+    const raw=cVals.get(k); if(!raw) continue;
+    const key=k.slice(2+64), h=raw.slice(2), par=rdU32(key,8);
+    if(!kids.has(par)) kids.set(par,[]);
+    kids.get(par).push({id:rdU32(key,20),value:rdU128(h,4),
+      meta:h.substr(40,64),status:parseInt(h.substr(104,2),16)});
+  }
+  for(const a of kids.values()) a.sort((x,y)=>x.id-y.id);
+}
+
+function renderKids(){
+  const list=kids.get(META[active].id)||[];
+  $('kids').innerHTML = (list.length?list.map(c=>{
+    const s=STATUS[c.status]||{n:'unknown',c:''};
+    return `<button class="kid" data-c="${c.id}" aria-current="${sel===c.id}">`+
+      `<span class="id">#${c.id}</span><span class="pill ${s.c}">${s.n}</span>`+
+      `<span class="amt">${fmt(c.value)} DOT</span></button>`}).join('')
+    : '<p style="color:var(--tx3);font-size:13.5px;margin:0">none yet</p>')+
+    `<button class="kid" data-c="new" aria-current="${sel===null}" style="margin-top:6px">`+
+    `<span class="id">+</span><span style="color:var(--tx2)">New child bounty</span></button>`;
+}
+function renderRail(){
+  const list=kids.get(META[active].id)||[];
+  const cur=sel===null?null:list.find(c=>c.id===sel);
+  const here=cur?(STATUS[cur.status]||{}).step:null;
+  $('rail').innerHTML=RAIL.map(([k,label])=>{
+    const isHere=k===here;
+    return `<button class="rl ${isHere?'here':''}" data-s="${k}" aria-current="${step===k}">`+
+      `<span class="n">${k==='pre'?'·':k[1]}</span><span>${label}</span>`+
+      (isHere?'<span class="here-tag">YOU ARE HERE</span>':'')+`</button>`}).join('');
+}
+const CURATORS={0:'HfMgvo7Lfuymg9sxii2H747rXdts5be6UfLPp6kXS4cNE9u',
+                1:'HyfBoVzPkikGdDv5P9pNoMkHrQJ5LvktdXwiv9RntbrTHi4',
+                2:'DVYbCSWbNfNxA2DXK1TUJSUaBYZVyeVq6AEvmp98S2nn3LH'};
+/* Fill runbook placeholders with the bounty and child actually selected, and mark
+   them so it is obvious which values are contextual rather than part of the text. */
+function subst(html){
+  const m=META[active];
+  const mark=v=>'<span class="fill">'+v+'</span>';
+  const cur = sel===null?null:(kids.get(m.id)||[]).find(c=>c.id===sel);
+  const pairs=[
+    ['BOUNTY_ID',        String(m.id)],
+    ['CHILD_ID',         sel===null?null:String(sel)],
+    ['CHILD_VALUE',      cur?cur.value.toLocaleString():null],
+    ['CHILD_METADATA',   cur?'0x'+cur.meta:null],
+    ['CURATOR_ACCOUNT',  CURATORS[m.id]],
+    ['CURATOR_MULTISIG', m.ms],
+  ];
+  for(const [k,v] of pairs){
+    if(v===null) continue;
+    html=html.split('&lt;'+k+'&gt;').join(mark(v)).split('<'+k+'>').join(mark(v));
+  }
+  // values the curator supplies rather than reads — never auto-filled
+  const you='<span class="you">you supply this</span>';
+  html=html.split('&lt;PREIMAGE_HASH&gt;').join(you).split('<PREIMAGE_HASH>').join(you);
+  return html;
+}
+
+function renderDoc(){
+  const sec=SECTIONS[step]; if(!sec){$('doc').innerHTML='<p>Not found.</p>';return}
+  let extra='';
+  if(BUILDERS[step]){
+    extra=`<div class="builder"><h3>Build the call for this step</h3><div class="brow">
+      <div><label for="act">Call</label><select id="act">`+
+      BUILDERS[step].map(([i,n])=>`<option value="${i}">${n}</option>`).join('')+
+      `</select></div>
+      <div id="childWrap"><label for="child">Child id <span style="text-transform:none;letter-spacing:0">(blank = parent)</span></label>
+        <input id="child" type="number" min="0" step="1"></div>
+      <div id="amtWrap"><label for="ivamt">Amount to add (DOT)</label>
+        <input id="ivamt" type="number" min="0" step="any" placeholder="3999"></div>
+      </div><div id="callout">Choose a call.</div></div>`;
+  } else if(NOVA[step]){
+    extra=`<div class="nobuild"><strong style="color:var(--amber)">Not built here.</strong> ${NOVA[step]}</div>`;
+  }
+  $('doc').innerHTML=`<span class="h1x">${sec.title}</span>`+extra+subst(sec.html)+
+    `<p style="margin-top:22px;font-size:12.5px;color:var(--tx3)">`+
+    `Values shown <span class="fill">like this</span> are live from chain for `+
+    `<strong>${META[active].name}</strong>`+(sel===null?'':` · child #${sel}`)+
+    `. Amber marks values you supply yourself. Unfilled placeholders mean nothing is selected yet.</p>`;
+  if(BUILDERS[step]){
+    ['act','child','ivamt'].forEach(i=>$(i)&&$(i).addEventListener('input',buildCall));
+    $('act').addEventListener('change',buildCall);
+    if(sel!==null&&$('child')) $('child').value=sel;
+    buildCall();
+  }
+}
+function buildCall(){
+  const idx=+$('act').value, m=META[active], isIV=idx===9, out=$('callout');
+  $('amtWrap').style.display=isIV?'':'none';
+  $('childWrap').style.display=isIV?'none':'';
+  try{
+    let bytes,argText,name=(BUILDERS[step].find(b=>b[0]===idx)||[,'?'])[1];
+    if(isIV){
+      const raw=$('ivamt').value.trim();
+      if(!raw){out.textContent='Enter an amount to add.';return}
+      const pl=BigInt(Math.round(parseFloat(raw)*1e10));
+      if(pl<=0n){out.textContent='Amount must be greater than zero.';return}
+      bytes=[PALLET,idx,...compact(m.id),...compact(pl)];
+      argText=`parent_bounty_id: ${m.id}, amount: ${pl} planck (${fmt(pl)} DOT)`;
+    }else{
+      const c=$('child').value.trim(), child=c===''?null:parseInt(c,10);
+      bytes=[PALLET,idx,...compact(m.id),...optU32(child)];
+      argText=`parent_bounty_id: ${m.id}, child_bounty_id: ${child===null?'None':'Some('+child+')'}`;
+    }
+    out.innerHTML=`<strong style="color:var(--tx)">multiAssetBounties.${name}</strong>`+
+      `<div class="mono" style="font-size:12.5px;margin-top:5px">${argText}</div>`+
+      `<code class="callhex">${toHex(bytes)}</code><button class="copy" id="cp">Copy call data</button>`+
+      `<div class="verify">Before signing: decode this in Polkadot.js → Developer → Extrinsics → Decode `+
+      `and confirm it matches the call and arguments above. Then wrap it as `+
+      `multisig → proxy.proxy (Governance) → this call.</div>`;
+    $('cp').onclick=()=>{navigator.clipboard.writeText(toHex(bytes));
+      $('cp').textContent='Copied';setTimeout(()=>$('cp').textContent='Copy call data',1400)};
+  }catch(e){out.textContent='Could not encode: '+e.message}
+}
+function render(){
+  const m=META[active], b=bounties.get(m.id);
+  const pot=balances.get(derive('mbt',m.id))||0n, val=b?b.value:0n;
+  $('pot').innerHTML=fmt(pot)+'<small>DOT</small>';
+  $('val').innerHTML=fmt(val)+'<small>DOT</small>';
+  $('head').innerHTML=fmt(pot>val?pot-val:0n)+'<small>DOT</small>';
+  renderKids(); renderRail(); renderDoc(); renderRefs();
+}
+
+/* ── boot ───────────────────────────────────────────────────────────────── */
+$('tabs').innerHTML=META.map((b,i)=>
+  `<button class="tab" role="tab" data-i="${i}" aria-selected="${i===0}">${b.name}</button>`).join('');
+$('tabs').onclick=e=>{const t=e.target.closest('.tab');if(!t)return;
+  active=+t.dataset.i;sel=null;step='pre';
+  [...$('tabs').children].forEach((x,i)=>x.setAttribute('aria-selected',i===active));render()};
+$('kids').addEventListener('click',e=>{const k=e.target.closest('.kid');if(!k)return;
+  if(k.dataset.c==='new'){sel=null;step='pre'}
+  else{sel=+k.dataset.c;
+    const c=(kids.get(META[active].id)||[]).find(x=>x.id===sel);
+    if(c) step=(STATUS[c.status]||{step:'pre'}).step}
+  render()});
+$('rail').addEventListener('click',e=>{const r=e.target.closest('.rl');if(!r)return;
+  step=r.dataset.s;renderRail();renderDoc()});
+
+function renderRefs(){
+  $('roles').innerHTML=SECTIONS.roles?subst(SECTIONS.roles.html):'';
+  $('issues').innerHTML=SECTIONS.issues?subst(SECTIONS.issues.html):'';
+}
+
+(async()=>{
+  try{
+    setBusy('connecting');
+    await connect();
+    setBusy('reading chain');
+    const chain=await rpc('system_chain'), head=await rpc('chain_getHeader');
+    await loadAll(setBusy);
+    setConn(true,`${chain} · #${parseInt(head.number,16).toLocaleString()}`);
+    render();
+  }catch(e){ setConn(false,'error: '+e.message);
+    $('doc').innerHTML=`<p style="color:var(--red)">${e.message}</p>`+(SECTIONS.pre?SECTIONS.pre.html:''); }
+})();
+</script>
+</body>
+</html>
