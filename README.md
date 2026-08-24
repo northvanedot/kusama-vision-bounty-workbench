@@ -28,13 +28,14 @@ verified byte-for-byte against `@polkadot/api` output for the same arguments.
 
 `fundBounty`, `fundChildBounty`, `proposeCurator` and `awardBounty` are deliberately **not**
 built here. They take `MultiAddress`, `H256` and `VersionedLocatableAccount` arguments —
-exactly the argument class the runbook documents an encoding bug for. Build those in Nova,
-where the UI encodes them from runtime metadata.
+exactly the argument class the runbook documents an encoding bug for. Build those in Nova Spektr
+(the desktop wallet — not Nova Wallet) or Polkadot.js Apps, where the UI encodes them
+from runtime metadata.
 
 ## Before you sign anything
 
-Decode the call data in **Polkadot.js → Developer → Extrinsics → Decode** and confirm it
-matches the call and arguments the page displays. The page proposes; Polkadot.js confirms.
+Decode the call data in **Polkadot.js Apps → Developer → Extrinsics → Decode** and confirm it
+matches the call and arguments the page displays. The page proposes; Polkadot.js Apps confirms.
 Do not sign on this tool's word alone.
 
 ## Rebuilding

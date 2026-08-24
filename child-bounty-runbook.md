@@ -92,6 +92,32 @@ curator multisig
       call: <nested call>
 ```
 
+### Signing tool
+
+The steps below were written and tested in **Nova Spektr** — the desktop wallet, not
+Nova Wallet. They are different products from the same team: Nova Wallet is the mobile
+wallet, Nova Spektr is the desktop client with the multisig and proxy workflow.
+
+Nothing in this runbook depends on Nova Spektr specifically. Any client works if it can
+do all four of these:
+
+| Needs to | Why |
+|---|---|
+| Connect to Kusama Asset Hub and load current runtime metadata | the bounty pallet is not in any hardcoded call list; the client has to read it from the chain |
+| Build an arbitrary pallet call, not just transfers and staking | every call here comes from `multiAssetBounties` |
+| Wrap a call in `proxy.proxy` with an explicit `force_proxy_type` | `Governance` has to be set deliberately, not defaulted |
+| Submit as `multisig.as_multi` and show the call hash and call data | co-signers verify the hash; the chain stores only the hash, so the last signatory must supply the call data |
+
+Polkadot.js Apps (Developer → Extrinsics) meets all four and is the fallback when a
+wallet cannot build the nested call. Other multisig clients exist — Mimir, Multix,
+Signet, Polkasafe — but none of them has been run against these steps. Treat them as
+untested rather than unsupported.
+
+**If signatories use different clients:** an operation created outside Nova Spektr shows
+there as an “Unknown” operation — it decodes only the operation types it builds itself. The
+operation can still be signed and executed. Verify it by call hash in that case, not by
+the description on screen.
+
 ---
 
 ## Pre-check — Confirm Parent Bounty Status and Funds
@@ -835,9 +861,9 @@ The `location: Here` means the payment is made on Kusama Asset Hub.
 
 The `accountId` is the beneficiary account that will receive the payout.
 
-### 4.5 Nova/Spektr beneficiary encoding issue
+### 4.5 Nova Spektr beneficiary encoding issue
 
-During testing, Nova/Spektr sometimes defaulted the beneficiary `AccountId32` to:
+During testing, Nova Spektr sometimes defaulted the beneficiary `AccountId32` to:
 
 ```text
 0x0000000000000000000000000000000000000000000000000000000000000000
@@ -882,7 +908,7 @@ baked into it, not yours.
 <BENEFICIARY_HEX>        beneficiary account id    (32 bytes)
 ```
 
-Build your own version in Nova Spektr or Polkadot.js and let it encode from metadata.
+Build your own version in Nova Spektr or Polkadot.js Apps and let it encode from metadata.
 Use the layout above only to check that what the UI produced has the shape you expect.
 
 This decodes to:
@@ -1000,7 +1026,7 @@ AccountId32:
 
 This is the curator multisig account.
 
-For the call hash, use the award call hash from Nova/Spektr or Polkadot.js decode.
+For the call hash, use the award call hash from Nova Spektr or a Polkadot.js Apps decode.
 
 Leave the optional block hash field blank.
 
