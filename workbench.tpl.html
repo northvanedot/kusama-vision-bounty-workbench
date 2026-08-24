@@ -96,6 +96,16 @@ h1{font-family:var(--f-disp);font-size:28px;font-weight:800;letter-spacing:-.02e
 .pill.cyan{border-color:rgba(92,224,214,.4);color:var(--cyan)}
 .pill.amber{border-color:rgba(217,164,65,.4);color:var(--amber)}
 
+.bnote{font-size:12.5px;color:var(--tx3);margin:0 0 9px;line-height:1.5}
+#benBody input{width:100%;font-family:var(--f-mono);font-size:12.5px;padding:9px 11px;
+  background:var(--inset);border:1px solid var(--bd);border-radius:8px;color:var(--tx)}
+#benBody input:focus{outline:2px solid var(--blue);outline-offset:1px}
+.bval{font-family:var(--f-mono);font-size:12px;color:var(--cyan);word-break:break-all;margin-bottom:6px}
+.bhex{font-family:var(--f-mono);font-size:11.5px;color:var(--cyan);word-break:break-all;
+  background:#0007;padding:8px 10px;border-radius:7px;margin:9px 0 6px}
+#benOut.bad .bnote{color:var(--red)}
+#benOut.ok .bnote{color:var(--tx3)}
+
 .rail{display:flex;flex-direction:column;gap:3px}
 .rl{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:9px;border:1px solid transparent;
   background:none;color:var(--tx2);cursor:pointer;font-size:14px;text-align:left;width:100%}
@@ -184,6 +194,10 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--bd);font-size
       <h2>Child bounties</h2>
       <div id="kids"><div class="skel" style="width:88%"></div><div class="skel" style="width:70%"></div><div class="skel" style="width:80%"></div></div>
     </div>
+    <div class="panel" id="benPanel">
+      <h2>Beneficiary</h2>
+      <div id="benBody"></div>
+    </div>
     <div class="panel">
       <h2>Runbook</h2>
       <div class="rail" id="rail"></div>
@@ -257,6 +271,70 @@ function derive(tag,...ix){const a=new Uint8Array(32);let p=0;
   for(const i of ix){a.set(le(i,4),p);p+=4}return hxs(a)}
 
 /* ── SCALE · verified byte-for-byte against @polkadot/api ───────────────── */
+/* ── blake2b + base58 · SS58 decode with checksum. Matched against the
+   reference decoder on six known addresses; rejects mistyped, truncated
+   and non-base58 input rather than decoding to garbage. ──────────────── */
+// blake2b (BigInt, single-block inputs are all we need for SS58 checksums)
+const IV=[0x6a09e667f3bcc908n,0xbb67ae8584caa73bn,0x3c6ef372fe94f82bn,0xa54ff53a5f1d36f1n,
+          0x510e527fade682d1n,0x9b05688c2b3e6c1fn,0x1f83d9abfb41bd6bn,0x5be0cd19137e2179n];
+const SIG=[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],[14,10,4,8,9,15,13,6,1,12,0,2,11,7,5,3],
+[11,8,12,0,5,2,15,13,10,14,3,6,7,1,9,4],[7,9,3,1,13,12,11,14,2,6,5,10,4,0,15,8],
+[9,0,5,7,2,4,10,15,14,1,11,12,6,8,3,13],[2,12,6,10,0,11,8,3,4,13,7,5,15,14,1,9],
+[12,5,1,15,14,13,4,10,0,7,6,3,9,2,8,11],[13,11,7,14,12,1,3,9,5,0,15,4,8,6,2,10],
+[6,15,14,9,11,3,0,8,12,2,13,7,1,4,10,5],[10,2,8,4,7,6,1,5,15,11,9,14,3,12,13,0],
+[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],[14,10,4,8,9,15,13,6,1,12,0,2,11,7,5,3]];
+const M64=(1n<<64n)-1n;
+const rotr=(x,n)=>((x>>n)|(x<<(64n-n)))&M64;
+function blake2b(input,outLen=64){
+  const h=IV.slice(); h[0]^=0x01010000n^BigInt(outLen);
+  const block=new Uint8Array(128); block.set(input);
+  const m=[]; for(let i=0;i<16;i++){let v=0n;for(let j=7;j>=0;j--)v=(v<<8n)|BigInt(block[i*8+j]);m.push(v)}
+  const v=[...h,...IV]; v[12]^=BigInt(input.length); v[14]^=M64;   // final block
+  const G=(a,b,c,d,x,y)=>{
+    v[a]=(v[a]+v[b]+x)&M64; v[d]=rotr(v[d]^v[a],32n);
+    v[c]=(v[c]+v[d])&M64;   v[b]=rotr(v[b]^v[c],24n);
+    v[a]=(v[a]+v[b]+y)&M64; v[d]=rotr(v[d]^v[a],16n);
+    v[c]=(v[c]+v[d])&M64;   v[b]=rotr(v[b]^v[c],63n);
+  };
+  for(let r=0;r<12;r++){const s=SIG[r];
+    G(0,4,8,12,m[s[0]],m[s[1]]); G(1,5,9,13,m[s[2]],m[s[3]]);
+    G(2,6,10,14,m[s[4]],m[s[5]]); G(3,7,11,15,m[s[6]],m[s[7]]);
+    G(0,5,10,15,m[s[8]],m[s[9]]); G(1,6,11,12,m[s[10]],m[s[11]]);
+    G(2,7,8,13,m[s[12]],m[s[13]]); G(3,4,9,14,m[s[14]],m[s[15]]);}
+  const out=new Uint8Array(outLen);
+  for(let i=0;i<8;i++){let x=h[i]^v[i]^v[i+8];
+    for(let j=0;j<8;j++){const p=i*8+j; if(p<outLen) out[p]=Number((x>>BigInt(8*j))&0xffn);}}
+  return out;
+}
+const A='123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+function b58decode(str){
+  let n=0n; for(const c of str){const i=A.indexOf(c); if(i<0) throw new Error('invalid base58 character: '+c); n=n*58n+BigInt(i);}
+  const bytes=[]; while(n>0n){bytes.unshift(Number(n&0xffn)); n>>=8n;}
+  for(const c of str){ if(c!=='1') break; bytes.unshift(0); }
+  return Uint8Array.from(bytes);
+}
+function ss58ToHex(address){
+  const raw=b58decode(address.trim());
+  const pl=raw[0]<64?1:2;
+  if(raw.length!==pl+34) throw new Error('not a 32-byte SS58 address');
+  const body=raw.slice(0,pl+32), sum=raw.slice(pl+32);
+  const exp=blake2b(Uint8Array.from([...new TextEncoder().encode('SS58PRE'),...body]),64);
+  if(sum[0]!==exp[0]||sum[1]!==exp[1]) throw new Error('checksum mismatch — address is mistyped or incomplete');
+  return [...raw.slice(pl,pl+32)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function hexToSs58(hex,prefix=2){
+  const raw=Uint8Array.from(hex.match(/../g).map(x=>parseInt(x,16)));
+  const pre = prefix<64 ? [prefix] : [((prefix&0xfc)>>2)|0x40,(prefix>>8)|((prefix&3)<<6)];
+  const body=Uint8Array.from([...pre,...raw]);
+  const sum=blake2b(Uint8Array.from([...new TextEncoder().encode('SS58PRE'),...body]),64);
+  const full=[...body,sum[0],sum[1]];
+  let n=0n; for(const b of full) n=(n<<8n)|BigInt(b);
+  let out=''; while(n>0n){ out=A[Number(n%58n)]+out; n/=58n; }
+  for(const b of full){ if(b!==0) break; out='1'+out; }
+  return out;
+}
+
 function compact(v){v=BigInt(v);
   if(v<0n)throw new Error('negative');
   if(v<64n)return[Number(v)<<2];
@@ -286,6 +364,7 @@ const fmt=p=>(Number(p)/1e10).toLocaleString(undefined,{maximumFractionDigits:4}
 /* ── state ──────────────────────────────────────────────────────────────── */
 let balances=new Map(), bounties=new Map(), kids=new Map();
 let active=0, sel=null, step='pre';
+let benInput='', benHex='', benSs58='', benFromChain=false;
 
 async function loadAll(prog){
   const batch = async keys => {                    // one round-trip for many keys
@@ -332,8 +411,13 @@ async function loadAll(prog){
     const raw=cVals.get(k); if(!raw) continue;
     const key=k.slice(2+64), h=raw.slice(2), par=rdU32(key,8);
     if(!kids.has(par)) kids.set(par,[]);
-    kids.get(par).push({id:rdU32(key,20),value:rdU128(h,4),
-      meta:h.substr(40,64),status:parseInt(h.substr(104,2),16)});
+    const st=parseInt(h.substr(104,2),16);
+    const rec={id:rdU32(key,20),value:rdU128(h,4),meta:h.substr(40,64),status:st};
+    // PayoutAttempted carries the beneficiary: the 32-byte account id sits just
+    // before the 9-byte payment_status trailer. Checked against @polkadot/api
+    // for both V4- and V5-encoded beneficiaries.
+    if(st===5){ const n=h.length/2; rec.beneficiary=h.slice((n-41)*2,(n-9)*2); }
+    kids.get(par).push(rec);
   }
   for(const a of kids.values()) a.sort((x,y)=>x.id-y.id);
 }
@@ -349,6 +433,49 @@ function renderKids(){
     `<button class="kid" data-c="new" aria-current="${sel===null}" style="margin-top:6px">`+
     `<span class="id">+</span><span style="color:var(--tx2)">New child bounty</span></button>`;
 }
+/* A beneficiary belongs to exactly one bounty and child. Carrying it across a
+   selection change would show one bounty's payout address in another's steps,
+   so wipe it whenever the selection moves. */
+function clearBen(){ benInput=''; benHex=''; benSs58=''; benFromChain=false; }
+
+function renderBeneficiary(){
+  const m=META[active];
+  const cur = sel===null?null:(kids.get(m.id)||[]).find(c=>c.id===sel);
+  const onChain = cur && cur.beneficiary;
+  const box=$('benBody');
+  if(onChain){
+    benFromChain=true; benHex=cur.beneficiary;
+    try{ benSs58=hexToSs58(benHex); }catch(e){ benSs58=''; }
+    box.innerHTML=`<p class="bnote">Already awarded — read from chain.</p>`+
+      `<div class="bval">${benSs58||'(could not encode)'}</div>`+
+      `<div class="bhex">0x${benHex}</div>`;
+    return;
+  }
+  benFromChain=false;
+  box.innerHTML=`<p class="bnote">Not on chain yet. The applicant supplies this — confirm it with them in writing.</p>`+
+    `<input id="benIn" type="text" spellcheck="false" autocomplete="off" placeholder="SS58 address" value="${benInput.replace(/"/g,'&quot;')}">`+
+    `<div id="benOut"></div>`;
+  $('benIn').addEventListener('input',onBen);
+  onBen();
+}
+function onBen(){
+  const el=$('benIn'); if(!el) return;
+  benInput=el.value.trim();
+  const out=$('benOut');
+  if(!benInput){ benHex=''; benSs58=''; out.innerHTML=''; renderDoc(); return }
+  try{
+    benHex=ss58ToHex(benInput); benSs58=benInput;
+    out.className='ok';
+    out.innerHTML=`<div class="bhex">0x${benHex}</div>`+
+      `<p class="bnote">Checksum valid. This is the AccountId32 the award call needs.</p>`;
+  }catch(e){
+    benHex=''; benSs58='';
+    out.className='bad';
+    out.innerHTML=`<p class="bnote">${e.message}</p>`;
+  }
+  renderDoc();
+}
+
 function renderRail(){
   const list=kids.get(META[active].id)||[];
   const cur=sel===null?null:list.find(c=>c.id===sel);
@@ -373,6 +500,8 @@ function subst(html){
     ['CHILD_ID',         sel===null?null:String(sel)],
     ['CHILD_VALUE',      cur?cur.value.toLocaleString():null],
     ['CHILD_METADATA',   cur?'0x'+cur.meta:null],
+    ['BENEFICIARY_HEX',  benHex?'0x'+benHex:null],
+    ['BENEFICIARY_SS58', benSs58||null],
     ['CURATOR_ACCOUNT',  CURATORS[m.id]],
     ['CURATOR_MULTISIG', m.ms],
   ];
@@ -380,9 +509,18 @@ function subst(html){
     if(v===null) continue;
     html=html.split('&lt;'+k+'&gt;').join(mark(v)).split('<'+k+'>').join(mark(v));
   }
-  // values the curator supplies rather than reads — never auto-filled
-  const you='<span class="you">you supply this</span>';
-  html=html.split('&lt;PREIMAGE_HASH&gt;').join(you).split('<PREIMAGE_HASH>').join(you);
+  // values that must never be auto-filled: the curator supplies them, or they are
+  // structural markers in a worked example that must not be reassembled and submitted
+  const SUPPLY={
+    PREIMAGE_HASH:      'you supply this',
+    BENEFICIARY_SS58:   'enter the beneficiary address (left panel)',
+    BENEFICIARY_HEX:    'enter the beneficiary address (left panel)',
+    CURATOR_ACCOUNT_ID: '32 bytes',
+  };
+  for(const [k,label] of Object.entries(SUPPLY)){
+    const tag='<span class="you">'+label+'</span>';
+    html=html.split('&lt;'+k+'&gt;').join(tag).split('<'+k+'>').join(tag);
+  }
   return html;
 }
 
@@ -450,16 +588,17 @@ function render(){
   $('pot').innerHTML=fmt(pot)+'<small>DOT</small>';
   $('val').innerHTML=fmt(val)+'<small>DOT</small>';
   $('head').innerHTML=fmt(pot>val?pot-val:0n)+'<small>DOT</small>';
-  renderKids(); renderRail(); renderDoc(); renderRefs();
+  renderKids(); renderBeneficiary(); renderRail(); renderDoc(); renderRefs();
 }
 
 /* ── boot ───────────────────────────────────────────────────────────────── */
 $('tabs').innerHTML=META.map((b,i)=>
   `<button class="tab" role="tab" data-i="${i}" aria-selected="${i===0}">${b.name}</button>`).join('');
 $('tabs').onclick=e=>{const t=e.target.closest('.tab');if(!t)return;
-  active=+t.dataset.i;sel=null;step='pre';
+  active=+t.dataset.i;sel=null;step='pre';clearBen();
   [...$('tabs').children].forEach((x,i)=>x.setAttribute('aria-selected',i===active));render()};
 $('kids').addEventListener('click',e=>{const k=e.target.closest('.kid');if(!k)return;
+  clearBen();
   if(k.dataset.c==='new'){sel=null;step='pre'}
   else{sel=+k.dataset.c;
     const c=(kids.get(META[active].id)||[]).find(x=>x.id===sel);

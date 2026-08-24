@@ -719,19 +719,27 @@ curator multisig
 
 ### 4.1 Beneficiary account
 
-The beneficiary provided this Kusama/Asset Hub address:
+The beneficiary address comes from the applicant, off chain — from the proposal, the
+Matrix room, or wherever the payout details were agreed. It is **not** derivable from
+chain state, so if you do not have it yet, stop here and ask for it before going further.
+
+Confirm it with them in writing before using it. A payout goes to whatever address you
+put in this field, and it cannot be reversed.
 
 ```text
-FfDhYNF9pStknnmRKuipNSgpjeknhin45GKjHejFArjnKZt
+Beneficiary (SS58, Kusama Asset Hub):  <BENEFICIARY_SS58>
 ```
 
-This decodes to the following 32-byte account ID:
+The `AccountId32` field takes the 32-byte account id, not the SS58 string, so decode it:
 
 ```text
-0x8871579fd0c679ace59d1e62cda57c339ed883de8357a49f2a4dace411478327
+Polkadot.js  →  Settings → Developer, or any SS58 utility
+Result:  <BENEFICIARY_HEX>   (32 bytes / 64 hex characters)
 ```
 
-This is the value that must be used in the `AccountId32` field.
+Sanity-check the decode by re-encoding the hex back to SS58 and confirming you get the
+same address the beneficiary gave you. A wrong decode is not obvious by eye and pays the
+wrong account.
 
 ### 4.2 Beneficiary existential deposit note
 
@@ -798,7 +806,7 @@ accountId:
   interior: X1
     AccountId32:
       network: null
-      id: 0x8871579fd0c679ace59d1e62cda57c339ed883de8357a49f2a4dace411478327
+      id: <BENEFICIARY_HEX>
 ```
 
 The `location: Here` means the payment is made on Kusama Asset Hub.
@@ -830,16 +838,30 @@ The correct beneficiary ID must start with:
 and must be the full value:
 
 ```text
-0x8871579fd0c679ace59d1e62cda57c339ed883de8357a49f2a4dace411478327
+<BENEFICIARY_HEX>
 ```
 
 ### 4.6 Correct raw call data
 
-The corrected proxy-wrapped award call data is:
+The corrected call is the proxy-wrapped award, laid out byte by byte. It is broken into
+labelled segments deliberately — **do not paste this back together and submit it.** The
+account bytes below are placeholders; a reassembled blob would pay whichever account was
+baked into it, not yours.
 
 ```text
-0x2a0000e104b438e7893a9f9cbc59e7d057d61a85ed1b88e3a0ebc59733cb89637a5e7c01076205000101000000050000000101008871579fd0c679ace59d1e62cda57c339ed883de8357a49f2a4dace411478327
+2a 00                    proxy.proxy               (pallet 42, call 0)
+00 <CURATOR_ACCOUNT_ID>  real: MultiAddress::Id    (32 bytes)
+01 07                    force_proxy_type: Some(Governance)
+62 05                    multiAssetBounties.awardBounty  (pallet 98, call 5)
+00                       parent_bounty_id: compact(0)
+01 01000000              child_bounty_id: Some(1)
+05 00 00                 beneficiary: V5, location parents 0, Here
+01 01 00                 accountId: X1(AccountId32), network None
+<BENEFICIARY_HEX>        beneficiary account id    (32 bytes)
 ```
+
+Build your own version in Nova Spektr or Polkadot.js and let it encode from metadata.
+Use the layout above only to check that what the UI produced has the shape you expect.
 
 This decodes to:
 
@@ -857,7 +879,7 @@ proxy.proxy
           accountId:
             AccountId32
               network: null
-              id: 0x8871579fd0c679ace59d1e62cda57c339ed883de8357a49f2a4dace411478327
+              id: <BENEFICIARY_HEX>
 ```
 
 ### 4.7 Review before submitting
@@ -1062,19 +1084,19 @@ then the payout may still need another status check or further review.
 Check the beneficiary account on Kusama Asset Hub:
 
 ```text
-FfDhYNF9pStknnmRKuipNSgpjeknhin45GKjHejFArjnKZt
+<BENEFICIARY_SS58>
 ```
 
 Underlying AccountId32:
 
 ```text
-0x8871579fd0c679ace59d1e62cda57c339ed883de8357a49f2a4dace411478327
+<BENEFICIARY_HEX>
 ```
 
-Confirm the beneficiary received the expected payout amount:
+Confirm the beneficiary received the child bounty's full value:
 
 ```text
-0.1 DOT
+<CHILD_VALUE> planck
 ```
 
 on Kusama Asset Hub.
