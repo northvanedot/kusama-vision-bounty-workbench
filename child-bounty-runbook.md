@@ -35,6 +35,28 @@ child you have selected.
 | `CURATOR_ACCOUNT` | `HfMgvo7Lfuymg9sxii2H747rXdts5be6UfLPp6kXS4cNE9u` | `HyfBoVzPkikGdDv5P9pNoMkHrQJ5LvktdXwiv9RntbrTHi4` | `DVYbCSWbNfNxA2DXK1TUJSUaBYZVyeVq6AEvmp98S2nn3LH` |
 | `CURATOR_MULTISIG` | `FhDqdZBwWH16Auzttnc4hurJNVHNZYguMGPWxY2Bjzzxt6G` | `HNAgeYNFWJeNXBoe5Nf5KHLY5q2hp8X2UJNJjFGnrU8YYjw` | `D3LkMK27GeTV924MVcHJHDPwuHrk1jovzvAKKAoh3SJJHed` |
 
+### Placeholders used below
+
+The steps below carry these names wrapped in angle brackets. The workbench replaces each
+with the real value for whatever bounty and child you have selected; read this file
+directly on GitHub and they stay as written. Names are listed bare here so the table
+itself is not substituted.
+
+| Name | Source |
+|---|---|
+| `BOUNTY_ID` | the bounty you selected — `0`, `1` or `2` |
+| `CURATOR_ACCOUNT` | from `multiAssetBounties.bounties(BOUNTY_ID)` |
+| `CURATOR_MULTISIG` | from `proxy.proxies(CURATOR_ACCOUNT)`, the type-`7` Governance delegate |
+| `CHILD_ID` | the child bounty you selected |
+| `CHILD_VALUE` | its recorded value, in planck |
+| `CHILD_METADATA` | its metadata hash, from the child bounty record |
+| `BENEFICIARY_SS58` / `BENEFICIARY_HEX` | read from chain once the child bounty is awarded; **you supply it** beforehand — see 4.1 |
+| `PREIMAGE_HASH` | **you supply it** — the hash you produce in Step 1 |
+| `CURATOR_ACCOUNT_ID` | a structural marker inside a worked example, never filled |
+
+The two marked **you supply it** are never auto-filled, because nothing on chain can tell
+you what they should be. Everything else is read.
+
 Curator accounts read from `multiAssetBounties.bounties(BOUNTY_ID)`; multisigs read from
 `proxy.proxies(CURATOR_ACCOUNT)`, taking the delegate with proxy type `7` (Governance).
 Both queried on Kusama Asset Hub, 23 Aug 2026. Bounty 0's entries match the values this
