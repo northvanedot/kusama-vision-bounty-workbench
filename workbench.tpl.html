@@ -223,6 +223,10 @@ const RPC='wss://kusama-asset-hub-rpc.polkadot.io';
 const FA='0x30e64a56026f4b5e3c2d196283a9a17db99d880ec681799c0cf30e8886371da997b69dec7cf3a4f83de9da212d99f0be02010902';
 const BOUNTIES='0x673607b30ff936734d4c021c4a99196aa37f719efab16103103a0c8c2c784ce1';
 const CHILDREN='0x673607b30ff936734d4c021c4a99196aedfb05b766f199ce00df85317e33050e';
+/* Next child id comes from TotalChildBountiesPerParent, which counts completed children
+   too. ChildBountiesPerParent counts only active ones, so it would start handing out
+   ids that are already taken as soon as a child is closed. */
+const TOTALKIDS='0x673607b30ff936734d4c021c4a99196afd38cc93beb1b5c610618f02c1b02777';
 const META=[
  {id:0,name:'Proof of Personhood',           ms:'FhDqdZBwWH16Auzttnc4hurJNVHNZYguMGPWxY2Bjzzxt6G'},
  {id:1,name:'Art & Social Experiments',      ms:'HNAgeYNFWJeNXBoe5Nf5KHLY5q2hp8X2UJNJjFGnrU8YYjw'},
@@ -362,7 +366,7 @@ const setBusy=t=>$('conn').innerHTML='<span class="dot busy"></span>'+t+'…';
 const fmt=p=>(Number(p)/1e10).toLocaleString(undefined,{maximumFractionDigits:4});
 
 /* ── state ──────────────────────────────────────────────────────────────── */
-let balances=new Map(), bounties=new Map(), kids=new Map();
+let balances=new Map(), bounties=new Map(), kids=new Map(), nextKid=new Map();
 let active=0, sel=null, step='pre';
 let benInput='', benHex='', benSs58='', benFromChain=false;
 
@@ -420,6 +424,11 @@ async function loadAll(prog){
     kids.get(par).push(rec);
   }
   for(const a of kids.values()) a.sort((x,y)=>x.id-y.id);
+
+  const nKeys=META.map(b=>TOTALKIDS+t64c(le(b.id,4)));
+  const nVals=await batch(nKeys);
+  META.forEach((b,i)=>{ const raw=nVals.get(nKeys[i]);
+    if(raw) nextKid.set(b.id, rdU32(raw.slice(2),0)); });
 }
 
 function renderKids(){
@@ -497,7 +506,8 @@ function subst(html){
   const cur = sel===null?null:(kids.get(m.id)||[]).find(c=>c.id===sel);
   const pairs=[
     ['BOUNTY_ID',        String(m.id)],
-    ['CHILD_ID',         sel===null?null:String(sel)],
+    ['CHILD_ID',         sel!==null?String(sel)
+                          :(nextKid.has(m.id)?String(nextKid.get(m.id)):null)],
     ['CHILD_VALUE',      cur?cur.value.toLocaleString():null],
     ['CHILD_METADATA',   cur?'0x'+cur.meta:null],
     ['BENEFICIARY_HEX',  benHex?'0x'+benHex:null],
@@ -515,7 +525,9 @@ function subst(html){
     PREIMAGE_HASH:      'you supply this',
     BENEFICIARY_SS58:   'enter the beneficiary address (left panel)',
     BENEFICIARY_HEX:    'enter the beneficiary address (left panel)',
-    CURATOR_ACCOUNT_ID: '32 bytes',
+    CHILD_ID:           'the id this child gets (see 2.1)',
+    CURATOR_ACCOUNT_ID:     'curator account id',
+    BENEFICIARY_ACCOUNT_ID: 'beneficiary account id',
   };
   for(const [k,label] of Object.entries(SUPPLY)){
     const tag='<span class="you">'+label+'</span>';

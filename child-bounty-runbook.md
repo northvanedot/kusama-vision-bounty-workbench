@@ -53,6 +53,7 @@ itself is not substituted.
 | `BENEFICIARY_SS58` / `BENEFICIARY_HEX` | read from chain once the child bounty is awarded; **you supply it** beforehand — see 4.1 |
 | `PREIMAGE_HASH` | **you supply it** — the hash you produce in Step 1 |
 | `CURATOR_ACCOUNT_ID` | a structural marker inside a worked example, never filled |
+| `BENEFICIARY_ACCOUNT_ID` | same, for the beneficiary — 4.6 stays structural so it cannot be reassembled |
 
 The two marked **you supply it** are never auto-filled, because nothing on chain can tell
 you what they should be. Everything else is read.
@@ -98,6 +99,11 @@ The steps below were written and tested in **Nova Spektr** — the desktop walle
 Nova Wallet. They are different products from the same team: Nova Wallet is the mobile
 wallet, Nova Spektr is the desktop client with the multisig and proxy workflow.
 
+In Nova Spektr the arbitrary-call surface is **Custom operation → Build an operation** —
+not the multisig transfer/staking flow, and not documented on the docs site at the time of
+writing. It offers **Paste** for raw call data and **Build** for a metadata-driven form
+with typed argument fields.
+
 Nothing in this runbook depends on Nova Spektr specifically. Any client works if it can
 do all four of these:
 
@@ -114,9 +120,10 @@ Signet, Polkasafe — but none of them has been run against these steps. Treat t
 untested rather than unsupported.
 
 **If signatories use different clients:** an operation created outside Nova Spektr shows
-there as an “Unknown” operation — it decodes only the operation types it builds itself. The
-operation can still be signed and executed. Verify it by call hash in that case, not by
-the description on screen.
+there as an “Unknown” operation, because it cannot decode what it did not build. It can
+still be signed and executed. Verify it by call hash in that case, not by the description
+on screen. Operations built through Custom operation do decode by name for everyone on
+Nova Spektr — `Multi asset bounties: Award bounty` and so on.
 
 ---
 
@@ -421,45 +428,40 @@ curator multisig
       → multiAssetBounties.fundChildBounty
 ```
 
-### 2.1 Confirm the next child bounty ID
+### 2.1 The next child bounty ID
 
-Before creating a new child bounty, check how many child bounties already exist under the parent bounty.
+Child ids are handed out in order from zero, so the next one is the number of children this
+parent has ever had:
 
-Go to:
+```text
+child_bounty_id: <CHILD_ID>
+```
+
+The workbench reads that from chain and fills it into the steps below, so you should not
+have to look it up. To confirm it yourself:
 
 ```text
 Polkadot.js → Kusama Asset Hub → Developer → Chain state
+Query: multiAssetBounties.totalChildBountiesPerParent(<BOUNTY_ID>)
 ```
 
-Query:
+Use `totalChildBountiesPerParent`, **not** `childBountiesPerParent`. The second counts only
+**active** children, so as soon as one is closed it points at an id that is already taken.
 
-```text
-multiAssetBounties.totalChildBountiesPerParent(0)
-```
+### 2.2 Start the operation
 
-If the result is:
-
-```text
-1
-```
-
-then the next child bounty will likely be:
-
-```text
-child_bounty_id: 1
-```
-
-### 2.2 Start the multisig operation in Nova Spektr
-
-In Nova Spektr, create a new multisig operation.
-
-Use:
+In Nova Spektr this is **Custom operation → Build an operation**, not the multisig
+transfer/staking flow. Set:
 
 ```text
 Network: Kusama Asset Hub
-Submit from: PoP Bounty Team Kusama Vision multisig
+Submit from: <CURATOR_MULTISIG>
 Initiator: any curator multisig signatory
 ```
+
+The dialog then offers **Paste** (raw call data) or **Build** (pick module and call, and
+fill typed argument fields from metadata). Either works. The workbench emits call data
+you can paste; Build is the one described below.
 
 ### 2.3 Build the outer proxy call
 
@@ -480,7 +482,13 @@ force_proxy_type:
 Governance
 ```
 
-This means the curator multisig is acting through its Governance proxy over the parent bounty curator/proxied account.
+This means the curator multisig is acting through its Governance proxy over the parent
+bounty curator/proxied account.
+
+Some clients derive part of this from the account you submit from and show the route
+rather than asking you to build it. If yours does, do not also wrap the call by hand —
+check what it produced against the shape above and make sure the proxy type reads
+`Governance`.
 
 ### 2.4 Build the nested child bounty call
 
@@ -797,26 +805,13 @@ However, the beneficiary may still need fee-paying capability later to move or m
 
 ### 4.3 Build the outer proxy call
 
-In Nova Spektr, create a new multisig operation.
-
-Use:
-
-```text
-Network: Kusama Asset Hub
-Submit from: PoP Bounty Team Kusama Vision multisig
-Initiator: any curator multisig signatory
-```
-
-Select:
+Start the operation as in 2.2 — **Custom operation → Build an operation** on Kusama Asset
+Hub — then build the proxy wrap as in 2.3:
 
 ```text
 Pallet: proxy
 Call: proxy
-```
 
-Set:
-
-```text
 real:
 <CURATOR_ACCOUNT>
 
@@ -837,7 +832,7 @@ Set:
 
 ```text
 parent_bounty_id: <BOUNTY_ID>
-child_bounty_id: 1
+child_bounty_id: <CHILD_ID>
 ```
 
 For the beneficiary, use:
@@ -877,17 +872,14 @@ or shifted the account ID to:
 
 Do not submit the operation if the beneficiary is zero or shifted.
 
-The correct beneficiary ID must start with:
-
-```text
-0x8871579f...
-```
-
-and must be the full value:
+The beneficiary id in the call must match, byte for byte, the id you derived in 4.1:
 
 ```text
 <BENEFICIARY_HEX>
 ```
+
+A leading run of zero bytes is the tell. The id should begin with the same bytes your
+decode produced — not with `0x000000`.
 
 ### 4.6 Correct raw call data
 
@@ -903,10 +895,16 @@ baked into it, not yours.
 62 05                    multiAssetBounties.awardBounty  (pallet 98, call 5)
 00                       parent_bounty_id: compact(0)
 01 01000000              child_bounty_id: Some(1)
-05 00 00                 beneficiary: V5, location parents 0, Here
-01 01 00                 accountId: X1(AccountId32), network None
-<BENEFICIARY_HEX>        beneficiary account id    (32 bytes)
+05                       beneficiary: V5
+00 00                    location:  parents 0, Here
+00 01 01 00              accountId: parents 0, X1(AccountId32), network None
+<BENEFICIARY_ACCOUNT_ID> (32 bytes)
 ```
+
+`accountId` is a full `Location`, so it carries **its own `parents` byte** before `X1` —
+that is the leading `00` on that line. Dropping it shifts the account id one byte right and
+produces exactly the `0x0000008871579f…` symptom in 4.5. The award call is 47 bytes with the
+`AccountId32` beneficiary; if yours is 46, that byte is what is missing.
 
 Build your own version in Nova Spektr or Polkadot.js Apps and let it encode from metadata.
 Use the layout above only to check that what the UI produced has the shape you expect.
@@ -923,11 +921,12 @@ proxy.proxy
       child_bounty_id: 1
       beneficiary:
         V5
-          location: Here
-          accountId:
-            AccountId32
-              network: null
-              id: <BENEFICIARY_HEX>
+          location:  parents 0, Here
+          accountId: parents 0
+            X1
+              AccountId32
+                network: null
+                id: <BENEFICIARY_ACCOUNT_ID>
 ```
 
 ### 4.7 Review before submitting
@@ -941,21 +940,19 @@ real: <CURATOR_ACCOUNT>
 force_proxy_type: Governance
 nested call: multiAssetBounties.awardBounty
 parent_bounty_id: <BOUNTY_ID>
-child_bounty_id: 1
-beneficiary id: 0x8871579f...8327
+child_bounty_id: <CHILD_ID>
+beneficiary id: <BENEFICIARY_HEX>
 ```
 
-Do not submit if:
+Compare that beneficiary id against the one from 4.1 in full, not by its first few
+characters. Do not submit if it is zeroed:
 
 ```text
 beneficiary id: 0x000000...
 ```
 
-or:
-
-```text
-beneficiary id: 0x000000887...
-```
+or shifted right by a byte or more, which looks like the right id with zeros pushed in
+front of it.
 
 ### 4.8 Submit and collect approvals
 
