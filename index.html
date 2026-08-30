@@ -97,8 +97,10 @@ h1{font-family:var(--f-disp);font-size:28px;font-weight:800;letter-spacing:-.02e
 .pill.amber{border-color:rgba(217,164,65,.4);color:var(--amber)}
 
 .bnote{font-size:12.5px;color:var(--tx3);margin:0 0 9px;line-height:1.5}
+#amtBody input,
 #benBody input{width:100%;font-family:var(--f-mono);font-size:12.5px;padding:9px 11px;
   background:var(--inset);border:1px solid var(--bd);border-radius:8px;color:var(--tx)}
+#amtBody input:focus,
 #benBody input:focus{outline:2px solid var(--blue);outline-offset:1px}
 .bval{font-family:var(--f-mono);font-size:12px;color:var(--cyan);word-break:break-all;margin-bottom:6px}
 .bhex{font-family:var(--f-mono);font-size:11.5px;color:var(--cyan);word-break:break-all;
@@ -107,8 +109,11 @@ h1{font-family:var(--f-disp);font-size:28px;font-weight:800;letter-spacing:-.02e
 #benOut.ok .bnote{color:var(--tx3)}
 
 .rail{display:flex;flex-direction:column;gap:3px}
-.rl{display:flex;align-items:center;gap:11px;padding:8px 11px;border-radius:9px;border:1px solid transparent;
+.rl{display:flex;align-items:center;gap:11px 11px;padding:8px 11px;border-radius:9px;
+  border:1px solid transparent;flex-wrap:wrap;
   background:none;color:var(--tx2);cursor:pointer;font-size:14px;text-align:left;width:100%}
+/* Right-aligned, and free to drop to its own line when the status name is long. */
+.rl .pill{margin-left:auto;font-size:10px}
 .rl:hover{background:var(--inset);color:var(--tx)}
 .rl[aria-current="true"]{border-color:var(--blue);background:rgba(110,159,255,.08);color:var(--tx)}
 .rl .n{font-family:var(--f-mono);font-size:11px;color:var(--tx3);min-width:20px}
@@ -139,6 +144,10 @@ h1{font-family:var(--f-disp);font-size:28px;font-weight:800;letter-spacing:-.02e
 .you{background:rgba(217,164,65,.12);border-bottom:1px solid rgba(217,164,65,.45);
   padding:1px 4px;border-radius:3px;color:var(--amber);font-family:var(--f-disp);
   font-size:.85em;font-weight:600;letter-spacing:.04em}
+/* A marker in a worked example: visibly a label, not an action. */
+.struct{background:rgba(255,255,255,.04);border-bottom:1px dashed var(--tx3);
+  padding:1px 4px;border-radius:3px;color:var(--tx3);font-family:var(--f-disp);
+  font-size:.85em;letter-spacing:.04em}
 .fill{background:rgba(92,224,214,.13);border-bottom:1px solid rgba(92,224,214,.45);
   padding:1px 4px;border-radius:3px;color:var(--cyan);font-family:var(--f-mono);font-size:.95em}
 .doc pre .fill{font-size:1em}
@@ -166,6 +175,67 @@ details.ref{background:var(--card);border:1px solid var(--bd);border-radius:12px
 details.ref summary{font-family:var(--f-disp);font-size:13px;font-weight:600;padding:14px 20px;cursor:pointer;color:var(--tx2)}
 details.ref summary:hover{color:var(--tx)}
 details.ref .doc{border:none;border-radius:0;padding:0 30px 22px}
+/* Step phase: whether the selected child is past, at, or short of this step. */
+.phase{margin:0 0 18px;border-radius:12px;padding:13px 16px;border:1px solid}
+.phase.done{border-color:rgba(92,224,214,.26);background:rgba(92,224,214,.045)}
+.phase.soon{border-color:rgba(110,159,255,.22);background:rgba(110,159,255,.04)}
+.phase.wait{border-color:rgba(217,164,65,.30);background:rgba(217,164,65,.05)}
+.phase.wait .ph-h{color:var(--amber)}
+.phase .ph-todo{margin-top:11px;padding-top:10px;border-top:1px solid rgba(255,255,255,.06);font-size:12.5px;color:var(--tx2)}
+.phase .ph-caveat{margin-top:6px;font-size:12px;color:var(--tx3)}
+.kid.gone .id,.kid.gone .amt{color:var(--tx3)}
+.kid.gone .pill{border-style:dashed}
+#metaIn{width:100%;font-family:var(--f-mono);font-size:12px;line-height:1.55;padding:10px 12px;
+  background:var(--inset);border:1px solid var(--bd);border-radius:8px;color:var(--tx);resize:vertical}
+.mnote{font-size:12.5px;color:var(--tx3);margin:0 0 9px}
+.argpre{font-family:var(--f-mono);font-size:12px;line-height:1.6;background:#0007;
+  padding:12px 14px;border-radius:8px;color:var(--tx2);white-space:pre;overflow-x:auto;
+  margin:0 0 12px}
+.argpre .you{font-size:.9em}
+.metapre{font-family:var(--f-mono);font-size:11.5px;line-height:1.55;background:#0007;
+  padding:10px 12px;border-radius:8px;color:var(--tx2);white-space:pre-wrap;word-break:break-word;
+  margin:9px 0 0;max-height:220px;overflow:auto}
+.metadl{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;font-size:12.5px;margin:11px 0}
+.metadl dt{color:var(--tx3)}
+.metadl dd{margin:0;font-family:var(--f-mono);color:var(--cyan);word-break:break-all}
+.phase.s0v{border-color:var(--bd);background:var(--inset);font-size:12.5px;margin-bottom:16px}
+.phase .ph-note{color:var(--tx2)}
+details.ref-sub{border:1px solid var(--bd);border-radius:10px;background:var(--card);margin:14px 0}
+details.ref-sub>summary{font-family:var(--f-disp);font-size:13px;font-weight:600;padding:11px 16px;
+  cursor:pointer;color:var(--tx2);list-style:none}
+details.ref-sub>summary::-webkit-details-marker{display:none}
+details.ref-sub>summary::before{content:'▸ ';color:var(--tx3)}
+details.ref-sub[open]>summary::before{content:'▾ '}
+details.ref-sub>summary:hover{color:var(--tx)}
+details.ref-sub .stepbody{padding:0 16px 12px}
+.planlist{list-style:none;margin:10px 0 0;padding:0;font-size:12.5px}
+.planlist li{display:flex;gap:8px;align-items:baseline;padding:2px 0;color:var(--tx3)}
+.planlist li.done{color:var(--tx2)}
+.planlist .tick{color:var(--tx3);font-family:var(--f-mono)}
+.planlist li.done .tick{color:var(--cyan)}
+.planlist li.done strong{color:var(--tx2)}
+.phase .ph-check{margin-top:11px}
+.phase .ph-check .copy{margin-bottom:7px}
+.phase .ok-v{color:var(--cyan)} .phase .bad-v{color:var(--amber)}
+.phase dd.warn{color:var(--amber)}
+.phase .ph-h{font-family:var(--f-disp);font-size:11.5px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase}
+.phase.done .ph-h{color:var(--cyan)} .phase.soon .ph-h{color:var(--blue)}
+.phase .ph-s{margin-top:5px;font-size:12.5px;color:var(--tx2)}
+.phase dl{margin:10px 0 0;display:grid;grid-template-columns:auto 1fr;gap:4px 16px;font-size:12.5px}
+.phase dt{color:var(--tx3)}
+.phase dd{margin:0;font-family:var(--f-mono);color:var(--tx2);word-break:break-all}
+@media(max-width:720px){.phase dl{grid-template-columns:1fr;gap:1px 0}
+  .phase dt{margin-top:7px}}
+details.step{border:1px solid var(--bd);border-radius:12px;background:var(--card);margin-bottom:6px}
+details.step>summary{font-family:var(--f-disp);font-size:12.5px;font-weight:600;padding:12px 18px;
+  cursor:pointer;color:var(--tx2);list-style:none}
+details.step>summary::-webkit-details-marker{display:none}
+details.step>summary::before{content:'▸ ';color:var(--tx3)}
+details.step[open]>summary::before{content:'▾ '}
+details.step>summary:hover{color:var(--tx)}
+details.step .stepbody{padding:0 18px 16px}
+.rl.done .n{border-color:rgba(92,224,214,.4);color:var(--cyan)}
 footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--bd);font-size:12.5px;color:var(--tx3)}
 </style>
 </head>
@@ -175,7 +245,7 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--bd);font-size
 <header>
   <div>
     <h1>Kusama Vision Bounty Workbench</h1>
-    <p class="sub">Live chain state and the runbook, side by side. Reads only — it never signs.</p>
+    <p class="sub">The child-bounty runbook, filled in from chain for the child you select. Reads only — it never signs.</p>
   </div>
   <div id="conn"><span class="dot"></span>connecting…</div>
 </header>
@@ -193,6 +263,10 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--bd);font-size
     <div class="panel">
       <h2>Child bounties</h2>
       <div id="kids"><div class="skel" style="width:88%"></div><div class="skel" style="width:70%"></div><div class="skel" style="width:80%"></div></div>
+    </div>
+    <div class="panel" id="amtPanel">
+      <h2>Child bounty value</h2>
+      <div id="amtBody"></div>
     </div>
     <div class="panel" id="benPanel">
       <h2>Beneficiary</h2>
@@ -217,9 +291,14 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--bd);font-size
 </div>
 
 <script>
-const SECTIONS = {"roles": {"title": "Roles and Terminology", "html": "<h3>Bounty parameters</h3><p>Every step below is written against these three names. Pick the bounty you are working on and read its column; the workbench fills them in automatically for whichever bounty and child you have selected.</p><table><thead><tr><th></th><th><code>0</code> — Proof of Personhood</th><th><code>1</code> — Art &amp; Social Experiments</th><th><code>2</code> — Zero-Knowledge &amp; Cryptography</th></tr></thead><tbody><tr><td><code>BOUNTY_ID</code></td><td><code>0</code></td><td><code>1</code></td><td><code>2</code></td></tr><tr><td><code>CURATOR_ACCOUNT</code></td><td><code>HfMgvo7Lfuymg9sxii2H747rXdts5be6UfLPp6kXS4cNE9u</code></td><td><code>HyfBoVzPkikGdDv5P9pNoMkHrQJ5LvktdXwiv9RntbrTHi4</code></td><td><code>DVYbCSWbNfNxA2DXK1TUJSUaBYZVyeVq6AEvmp98S2nn3LH</code></td></tr><tr><td><code>CURATOR_MULTISIG</code></td><td><code>FhDqdZBwWH16Auzttnc4hurJNVHNZYguMGPWxY2Bjzzxt6G</code></td><td><code>HNAgeYNFWJeNXBoe5Nf5KHLY5q2hp8X2UJNJjFGnrU8YYjw</code></td><td><code>D3LkMK27GeTV924MVcHJHDPwuHrk1jovzvAKKAoh3SJJHed</code></td></tr></tbody></table><h3>Placeholders used below</h3><p>The steps below carry these names wrapped in angle brackets. The workbench replaces each with the real value for whatever bounty and child you have selected; read this file directly on GitHub and they stay as written. Names are listed bare here so the table itself is not substituted.</p><table><thead><tr><th>Name</th><th>Source</th></tr></thead><tbody><tr><td><code>BOUNTY_ID</code></td><td>the bounty you selected — <code>0</code>, <code>1</code> or <code>2</code></td></tr><tr><td><code>CURATOR_ACCOUNT</code></td><td>from <code>multiAssetBounties.bounties(BOUNTY_ID)</code></td></tr><tr><td><code>CURATOR_MULTISIG</code></td><td>from <code>proxy.proxies(CURATOR_ACCOUNT)</code>, the type-<code>7</code> Governance delegate</td></tr><tr><td><code>CHILD_ID</code></td><td>the child bounty you selected</td></tr><tr><td><code>CHILD_VALUE</code></td><td>its recorded value, in planck</td></tr><tr><td><code>CHILD_METADATA</code></td><td>its metadata hash, from the child bounty record</td></tr><tr><td><code>BENEFICIARY_SS58</code> / <code>BENEFICIARY_HEX</code></td><td>read from chain once the child bounty is awarded; <strong>you supply it</strong> beforehand — see 4.1</td></tr><tr><td><code>PREIMAGE_HASH</code></td><td><strong>you supply it</strong> — the hash you produce in Step 1</td></tr><tr><td><code>CURATOR_ACCOUNT_ID</code></td><td>a structural marker inside a worked example, never filled</td></tr><tr><td><code>BENEFICIARY_ACCOUNT_ID</code></td><td>same, for the beneficiary — 4.6 stays structural so it cannot be reassembled</td></tr></tbody></table><p>The two marked <strong>you supply it</strong> are never auto-filled, because nothing on chain can tell you what they should be. Everything else is read.</p><p>Curator accounts read from <code>multiAssetBounties.bounties(BOUNTY_ID)</code>; multisigs read from <code>proxy.proxies(CURATOR_ACCOUNT)</code>, taking the delegate with proxy type <code>7</code> (Governance). Both queried on Kusama Asset Hub, 23 Aug 2026. Bounty 0&#x27;s entries match the values this document was originally written with, which is what validates the method for the other two.</p><p>Every curator account also carries a second delegate with proxy type <code>0</code> (Any): <code>EFuprYL5sShF5qao4F9hVRrkbutFeoAgn4HHehq4Rkx3ahm</code>. It is the same account across all three bounties and holds unrestricted authority over each curator account — worth knowing about, not something curators act through.</p><p>Where this document says a transaction can be submitted by a <strong>curator multisig signatory</strong>, it means any one of that bounty&#x27;s signatories can initiate or submit it. The operation still needs the bounty&#x27;s threshold in approvals before it executes.</p><h3>Governance proxy</h3><p>The curator multisig uses a <strong>Governance proxy</strong> to act on behalf of the parent curator/proxied account.</p><p>When this document says:</p><pre><code>curator multisig via Governance proxy</code></pre><p>it means the operation should be structured as:</p><pre><code>curator multisig\n  → proxy.proxy\n      real: &lt;CURATOR_ACCOUNT&gt;\n      force_proxy_type: Governance\n      call: &lt;nested call&gt;</code></pre><h3>Signing tool</h3><p>The steps below were written and tested in <strong>Nova Spektr</strong> — the desktop wallet, not Nova Wallet. They are different products from the same team: Nova Wallet is the mobile wallet, Nova Spektr is the desktop client with the multisig and proxy workflow.</p><p>In Nova Spektr the arbitrary-call surface is <strong>Custom operation → Build an operation</strong> — not the multisig transfer/staking flow, and not documented on the docs site at the time of writing. It offers <strong>Paste</strong> for raw call data and <strong>Build</strong> for a metadata-driven form with typed argument fields.</p><p>Nothing in this runbook depends on Nova Spektr specifically. Any client works if it can do all four of these:</p><table><thead><tr><th>Needs to</th><th>Why</th></tr></thead><tbody><tr><td>Connect to Kusama Asset Hub and load current runtime metadata</td><td>the bounty pallet is not in any hardcoded call list; the client has to read it from the chain</td></tr><tr><td>Build an arbitrary pallet call, not just transfers and staking</td><td>every call here comes from <code>multiAssetBounties</code></td></tr><tr><td>Wrap a call in <code>proxy.proxy</code> with an explicit <code>force_proxy_type</code></td><td><code>Governance</code> has to be set deliberately, not defaulted</td></tr><tr><td>Submit as <code>multisig.as_multi</code> and show the call hash and call data</td><td>co-signers verify the hash; the chain stores only the hash, so the last signatory must supply the call data</td></tr></tbody></table><p>Polkadot.js Apps (Developer → Extrinsics) meets all four and is the fallback when a wallet cannot build the nested call. Other multisig clients exist — Mimir, Multix, Signet, Polkasafe — but none of them has been run against these steps. Treat them as untested rather than unsupported.</p><p><strong>If signatories use different clients:</strong> an operation created outside Nova Spektr shows there as an “Unknown” operation, because it cannot decode what it did not build. It can still be signed and executed. Verify it by call hash in that case, not by the description on screen. Operations built through Custom operation do decode by name for everyone on Nova Spektr — <code>Multi asset bounties: Award bounty</code> and so on.</p><hr>"}, "pre": {"title": "Pre-check — Confirm Parent Bounty Status and Funds", "html": "<p>Before creating a child bounty, confirm the parent bounty exists, is active, uses the expected asset, and has enough allocated value.</p><p>For this flow, the parent bounty is:</p><pre><code>parent_bounty_id: &lt;BOUNTY_ID&gt;</code></pre><h3>Check parent bounty storage</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multiAssetBounties.bounties(&lt;BOUNTY_ID&gt;)</code></pre><p>Expected parent bounty state:</p><pre><code>assetKind: DOT on Kusama Asset Hub\nvalue: &lt;current allocation — see note below&gt;\nstatus: Active\ncurator: &lt;CURATOR_ACCOUNT&gt;</code></pre><p><code>value</code> is the amount <strong>allocated to this parent bounty</strong>, not the pot balance. A freshly created bounty starts at <code>10,000,000,000</code> (1 DOT) and stays there until someone calls <code>increaseValue</code>. So a low <code>value</code> alongside a six-figure pot is the normal starting state, not a fault. Compare <code>value</code> against the child bounty you intend to create; if it is lower, run the <code>increaseValue</code> pre-check below first.</p><p>The parent bounty asset should show:</p><pre><code>assetKind:\n  V5:\n    location:\n      parents: 0\n      interior: Here\n    assetId:\n      parents: 2\n      interior:\n        X1:\n          GlobalConsensus: Polkadot</code></pre><p>This represents DOT as a foreign asset on Kusama Asset Hub.</p><h3>Confirm enough value</h3><p>The parent bounty value is:</p><pre><code>10,000,000,000</code></pre><p>For DOT with 10 decimals, this is:</p><pre><code>1 DOT</code></pre><p>The test child bounty value is:</p><pre><code>1,000,000,000</code></pre><p>For DOT with 10 decimals, this is:</p><pre><code>0.1 DOT</code></pre><p>So the parent bounty has enough allocated value for a <code>0.1 DOT</code> child bounty.</p><p>Do not create a child bounty if:</p><pre><code>- the parent bounty does not exist\n- the parent bounty is not Active\n- the asset is not the expected DOT asset\n- the parent bounty value is less than the intended child bounty value\n- the curator is not the expected parent curator/proxied account</code></pre><p>Note: a larger DOT balance in a pot or derived account does not necessarily mean it is spendable by a specific parent bounty. Treat the parent bounty <code>value</code> as the spendable allocation for that bounty.</p><hr>"}, "s0": {"title": "Step 0 — Increase the Parent Bounty Value", "html": "<p>Run this step when the parent bounty&#x27;s recorded <code>value</code> is lower than the child bounty you intend to create. Skip it when <code>value</code> already covers the amount.</p><p>This is the normal path after a monthly top-up: DOT arriving in the bounty account does not raise <code>value</code> on its own. The runtime documentation is explicit that the call exists to &quot;register funds that were transferred into the bounty account out-of-band (e.g. recurring external top-ups), so they become available to award or to allocate to child bounties.&quot;</p><h3>0.1 The call</h3><p>Verified against Kusama Asset Hub runtime metadata, 23 Aug 2026:</p><pre><code>multiAssetBounties.increase_value(\n  parent_bounty_id: BountyIndex,     // &lt;BOUNTY_ID&gt;\n  amount:           T::Balance       // the INCREMENT, not the new total\n)</code></pre><p><code>amount</code> is added to the existing <code>value</code>. It is not a new total. To take a bounty sitting at 1 DOT up to 4,000 DOT of headroom, pass <code>amount = 3,999 DOT</code> — or pass 4,000 and accept that <code>value</code> ends at 4,001.</p><p>DOT on Kusama Asset Hub has 10 decimals:</p><pre><code>1 DOT      = 10,000,000,000\n4,000 DOT  = 40,000,000,000,000</code></pre><h3>0.2 Before you call it</h3><p>Four things the runtime enforces or warns about:</p><pre><code>- Origin must be signed by the bounty curator.\n- The bounty must be in the Active state.\n- amount must be greater than 0.\n- value can only be increased, never decreased.</code></pre><p>Two consequences worth understanding before submitting:</p><p><strong>The curator pays an additional deposit.</strong> The curator deposit is re-evaluated against the new value and the difference is collected from the curator account. Confirm <code>&lt;CURATOR_ACCOUNT&gt;</code> holds enough free balance to cover it, or the call fails.</p><p><strong>The call does not check the bounty account actually holds the funds.</strong> It only updates the recorded number. You can raise <code>value</code> above the real balance and the failure will surface later, at award time, not here. Always check the pot balance covers the new value yourself — see the pre-check above.</p><p>Because the increase is irreversible, raise <code>value</code> by what the child bounty needs rather than by the whole pot.</p><h3>0.3 Who calls it, and how</h3><p>The origin must be the bounty curator, so this goes through the same proxy path as every other curator action:</p><pre><code>curator multisig\n  → proxy.proxy\n      real: &lt;CURATOR_ACCOUNT&gt;\n      force_proxy_type: Governance\n      call: multiAssetBounties.increase_value(&lt;BOUNTY_ID&gt;, amount)</code></pre><p>Initiate from any signatory; the operation needs the bounty&#x27;s threshold in approvals before it executes.</p><h3>0.4 Confirm it landed</h3><pre><code>multiAssetBounties.bounties(&lt;BOUNTY_ID&gt;)</code></pre><p>Check <code>value</code> has risen by <code>amount</code> and <code>status</code> is still <code>Active</code>. Only then continue to Step 1.</p><hr>"}, "s1": {"title": "Step 1 — Create and Register the Metadata Preimage", "html": "<p>Before creating a child bounty, create a metadata preimage on <strong>Kusama Asset Hub</strong>. The <code>metadata</code> field in <code>fundChildBounty</code> is an <code>H256</code> hash that points to an on-chain preimage.</p><p>The preimage must be created on <strong>Kusama Asset Hub</strong>, not the Kusama Relay Chain, because the <code>multiAssetBounties</code> pallet is running on Kusama Asset Hub.</p><h3>1.1 Create the metadata JSON</h3><p>Example metadata:</p><pre><code>{&quot;title&quot;:&quot;Test child bounty #2&quot;,&quot;description&quot;:&quot;Second test of the MultiAssetBounties child bounty flow using parent curator.&quot;,&quot;amount&quot;:&quot;0.1 DOT&quot;,&quot;parent_bounty_id&quot;:&lt;BOUNTY_ID&gt;,&quot;curator&quot;:&quot;parent&quot;}</code></pre><p>Keep the metadata simple and descriptive. Any change to spacing, punctuation, or text creates a different preimage hash.</p><h3>1.2 Submit the preimage</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Extrinsics</code></pre><p>Use:</p><pre><code>Pallet: preimage\nCall: notePreimage(bytes)\nSubmit from: any curator multisig signatory</code></pre><p>Paste the metadata JSON into the <code>bytes</code> field.</p><p>Use:</p><pre><code>Submit Transaction</code></pre><p>Do not use <code>Submit Unsigned</code>.</p><h3>1.3 Wait for finalization</h3><p>After submitting, wait until the transaction is:</p><pre><code>Finalized</code></pre><p>If it is only <code>Ready</code> or spinning, wait or check whether the wallet still needs approval.</p><h3>1.4 Confirm the preimage exists</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>preimage.preimageFor((H256, u32))</code></pre><p>For the example metadata above, use:</p><pre><code>H256:\n&lt;PREIMAGE_HASH&gt;\n\nu32:\n185</code></pre><p>Expected result:</p><pre><code>Some(0x...)</code></pre><p>or a returned bytes value.</p><p>If it returns:</p><pre><code>&lt;none&gt;</code></pre><p>the preimage is not stored on-chain and should not be used yet.</p><h3>1.5 Use the preimage hash as metadata</h3><p>Once confirmed, use the preimage hash as the <code>metadata</code> value in the child bounty creation call:</p><pre><code>metadata:\n&lt;PREIMAGE_HASH&gt;</code></pre><p>Important: do not use the <code>encoded call hash</code> from the <code>notePreimage</code> form. The metadata hash must be the actual preimage hash confirmed by <code>preimage.preimageFor</code>.</p><hr>"}, "s2": {"title": "Step 2 — Create/Fund the Child Bounty", "html": "<p>After the metadata preimage is confirmed on Kusama Asset Hub, create the child bounty using the curator multisig through the Governance proxy.</p><p>The curator multisig does <strong>not</strong> call <code>fundChildBounty</code> directly. The correct structure is:</p><pre><code>curator multisig\n  → proxy.proxy\n      → multiAssetBounties.fundChildBounty</code></pre><h3>2.1 The next child bounty ID</h3><p>Child ids are handed out in order from zero, so the next one is the number of children this parent has ever had:</p><pre><code>child_bounty_id: &lt;CHILD_ID&gt;</code></pre><p>The workbench reads that from chain and fills it into the steps below, so you should not have to look it up. To confirm it yourself:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state\nQuery: multiAssetBounties.totalChildBountiesPerParent(&lt;BOUNTY_ID&gt;)</code></pre><p>Use <code>totalChildBountiesPerParent</code>, <strong>not</strong> <code>childBountiesPerParent</code>. The second counts only <strong>active</strong> children, so as soon as one is closed it points at an id that is already taken.</p><h3>2.2 Start the operation</h3><p>In Nova Spektr this is <strong>Custom operation → Build an operation</strong>, not the multisig transfer/staking flow. Set:</p><pre><code>Network: Kusama Asset Hub\nSubmit from: &lt;CURATOR_MULTISIG&gt;\nInitiator: any curator multisig signatory</code></pre><p>The dialog then offers <strong>Paste</strong> (raw call data) or <strong>Build</strong> (pick module and call, and fill typed argument fields from metadata). Either works. The workbench emits call data you can paste; Build is the one described below.</p><h3>2.3 Build the outer proxy call</h3><p>Select:</p><pre><code>Pallet: proxy\nCall: proxy</code></pre><p>Set:</p><pre><code>real:\n&lt;CURATOR_ACCOUNT&gt;\n\nforce_proxy_type:\nGovernance</code></pre><p>This means the curator multisig is acting through its Governance proxy over the parent bounty curator/proxied account.</p><p>Some clients derive part of this from the account you submit from and show the route rather than asking you to build it. If yours does, do not also wrap the call by hand — check what it produced against the shape above and make sure the proxy type reads <code>Governance</code>.</p><h3>2.4 Build the nested child bounty call</h3><p>Inside the <code>call</code> field of <code>proxy.proxy</code>, select:</p><pre><code>Pallet: multiAssetBounties\nCall: fundChildBounty</code></pre><p>Use:</p><pre><code>parent_bounty_id: &lt;BOUNTY_ID&gt;\nvalue: &lt;CHILD_VALUE&gt;\nmetadata: &lt;CHILD_METADATA&gt;\ncurator: null</code></pre><p>The value:</p><pre><code>1,000,000,000</code></pre><p>represents <code>0.1 DOT</code> for the DOT asset, assuming 10 decimals.</p><p>In some UIs, the balance field may display as:</p><pre><code>0.001 KSM</code></pre><p>That is acceptable only if the operation preview shows the raw value as:</p><pre><code>&quot;value&quot;: &quot;&lt;CHILD_VALUE&gt;&quot;</code></pre><p>Do not submit if the preview shows:</p><pre><code>&quot;value&quot;: &quot;0&quot;</code></pre><p>or a much larger value.</p><h3>2.5 Use parent curator to reduce steps</h3><p>Set:</p><pre><code>curator: null</code></pre><p>This makes the child bounty use the parent curator by default.</p><p>That reduces the flow because the child bounty should move from:</p><pre><code>FundingAttempted → Active</code></pre><p>after <code>checkStatus</code>.</p><p>If a separate curator is assigned, the flow would be:</p><pre><code>FundingAttempted → Funded → acceptCurator → Active</code></pre><h3>2.6 Review the operation preview</h3><p>The operation should look like this:</p><pre><code>{\n  &quot;method&quot;: &quot;proxy&quot;,\n  &quot;section&quot;: &quot;proxy&quot;,\n  &quot;args&quot;: {\n    &quot;real&quot;: &quot;&lt;CURATOR_ACCOUNT&gt;&quot;,\n    &quot;force_proxy_type&quot;: &quot;Governance&quot;,\n    &quot;call&quot;: {\n      &quot;method&quot;: &quot;fundChildBounty&quot;,\n      &quot;section&quot;: &quot;multiAssetBounties&quot;,\n      &quot;args&quot;: {\n        &quot;parent_bounty_id&quot;: &quot;&lt;BOUNTY_ID&gt;&quot;,\n        &quot;value&quot;: &quot;&lt;CHILD_VALUE&gt;&quot;,\n        &quot;metadata&quot;: &quot;&lt;PREIMAGE_HASH&gt;&quot;,\n        &quot;curator&quot;: null\n      }\n    }\n  }\n}</code></pre><p>Do not submit if:</p><pre><code>force_proxy_type: null</code></pre><p>It must be:</p><pre><code>force_proxy_type: Governance</code></pre><h3>2.7 Submit and collect approvals</h3><p>Submit the operation from any curator multisig signatory.</p><p>After one signatory submits, the operation shows a partial signature count. The remaining signatories must approve before the operation executes — how many depends on this bounty&#x27;s multisig threshold, which the signing UI displays.</p><h3>2.8 Confirm the child bounty was created</h3><p>After the multisig reaches the threshold and executes, go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multiAssetBounties.totalChildBountiesPerParent(0)</code></pre><p>Expected result:</p><pre><code>2</code></pre><p>Then query:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>Expected result:</p><pre><code>parentBounty: &lt;BOUNTY_ID&gt;\nvalue: &lt;CHILD_VALUE&gt;\nmetadata: &lt;CHILD_METADATA&gt;\nstatus: FundingAttempted\ncurator: &lt;CURATOR_ACCOUNT&gt;</code></pre><p>This confirms the child bounty was created successfully and is ready for the funding status check.</p><hr>"}, "s3": {"title": "Step 3 — Check Funding Status", "html": "<p>After the multisig operation executes and the child bounty is created, the child bounty will usually start in this state:</p><pre><code>FundingAttempted</code></pre><p>This means the bounty record exists and the payment/funding attempt has been initiated, but the funding status has not yet been finalized.</p><h3>3.1 Confirm the child bounty state</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>Expected result before checking status:</p><pre><code>parentBounty: &lt;BOUNTY_ID&gt;\nvalue: &lt;CHILD_VALUE&gt;\nmetadata: &lt;CHILD_METADATA&gt;\nstatus: FundingAttempted</code></pre><h3>3.2 Run checkStatus</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Extrinsics</code></pre><p>Use:</p><pre><code>Pallet: multiAssetBounties\nCall: checkStatus</code></pre><p>Set:</p><pre><code>parentBountyId: &lt;BOUNTY_ID&gt;\nchildBountyId: Some(1)</code></pre><p>Then submit the transaction from any curator multisig signatory.</p><p>This call does not need to be submitted through the curator multisig. It can be submitted by any signed account.</p><h3>3.3 Confirm the updated state</h3><p>After <code>checkStatus</code> finalizes, query again:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>Expected result:</p><pre><code>status: Active\ncurator: &lt;CURATOR_ACCOUNT&gt;</code></pre><h3>3.4 Why it becomes Active</h3><p>Because the child bounty was created with:</p><pre><code>curator: null</code></pre><p>it uses the parent curator:</p><pre><code>&lt;CURATOR_ACCOUNT&gt;</code></pre><p>That means the flow skips the separate curator acceptance step.</p><p>The expected transition is:</p><pre><code>FundingAttempted → Active</code></pre><p>If a separate curator had been assigned, the transition would usually be:</p><pre><code>FundingAttempted → Funded → acceptCurator → Active</code></pre><hr>"}, "s4": {"title": "Step 4 — Award the Child Bounty to the Beneficiary", "html": "<p>After the child bounty is <code>Active</code>, it can be awarded to a beneficiary.</p><p>For this test, the active child bounty is:</p><pre><code>parent_bounty_id: &lt;BOUNTY_ID&gt;\nchild_bounty_id: 1\nvalue: &lt;CHILD_VALUE&gt;\nstatus: Active\ncurator: &lt;CURATOR_ACCOUNT&gt;</code></pre><p>Because the curator is the proxied parent curator account, the award must be executed through the curator multisig using the Governance proxy.</p><p>The correct structure is:</p><pre><code>curator multisig\n  → proxy.proxy\n      → multiAssetBounties.awardBounty</code></pre><h3>4.1 Beneficiary account</h3><p>The beneficiary address comes from the applicant, off chain — from the proposal, the Matrix room, or wherever the payout details were agreed. It is <strong>not</strong> derivable from chain state, so if you do not have it yet, stop here and ask for it before going further.</p><p>Confirm it with them in writing before using it. A payout goes to whatever address you put in this field, and it cannot be reversed.</p><pre><code>Beneficiary (SS58, Kusama Asset Hub):  &lt;BENEFICIARY_SS58&gt;</code></pre><p>The <code>AccountId32</code> field takes the 32-byte account id, not the SS58 string, so decode it:</p><pre><code>Polkadot.js  →  Settings → Developer, or any SS58 utility\nResult:  &lt;BENEFICIARY_HEX&gt;   (32 bytes / 64 hex characters)</code></pre><p>Sanity-check the decode by re-encoding the hex back to SS58 and confirming you get the same address the beneficiary gave you. A wrong decode is not obvious by eye and pays the wrong account.</p><h3>4.2 Beneficiary existential deposit note</h3><p>DOT on Kusama Asset Hub is a sufficient foreign asset, so the beneficiary does not need an existing KSM existential deposit just to receive the DOT payout.</p><p>However, the beneficiary may still need fee-paying capability later to move or manage the received funds.</p><h3>4.3 Build the outer proxy call</h3><p>Start the operation as in 2.2 — <strong>Custom operation → Build an operation</strong> on Kusama Asset Hub — then build the proxy wrap as in 2.3:</p><pre><code>Pallet: proxy\nCall: proxy\n\nreal:\n&lt;CURATOR_ACCOUNT&gt;\n\nforce_proxy_type:\nGovernance</code></pre><h3>4.4 Build the nested award call</h3><p>Inside the <code>call</code> field of <code>proxy.proxy</code>, select:</p><pre><code>Pallet: multiAssetBounties\nCall: awardBounty</code></pre><p>Set:</p><pre><code>parent_bounty_id: &lt;BOUNTY_ID&gt;\nchild_bounty_id: &lt;CHILD_ID&gt;</code></pre><p>For the beneficiary, use:</p><pre><code>beneficiary: V5\n\nlocation:\n  parents: 0\n  interior: Here\n\naccountId:\n  parents: 0\n  interior: X1\n    AccountId32:\n      network: null\n      id: &lt;BENEFICIARY_HEX&gt;</code></pre><p>The <code>location: Here</code> means the payment is made on Kusama Asset Hub.</p><p>The <code>accountId</code> is the beneficiary account that will receive the payout.</p><h3>4.5 Nova Spektr beneficiary encoding issue</h3><p>During testing, Nova Spektr sometimes defaulted the beneficiary <code>AccountId32</code> to:</p><pre><code>0x0000000000000000000000000000000000000000000000000000000000000000</code></pre><p>or shifted the account ID to:</p><pre><code>0x0000008871579f...</code></pre><p>Do not submit the operation if the beneficiary is zero or shifted.</p><p>The beneficiary id in the call must match, byte for byte, the id you derived in 4.1:</p><pre><code>&lt;BENEFICIARY_HEX&gt;</code></pre><p>A leading run of zero bytes is the tell. The id should begin with the same bytes your decode produced — not with <code>0x000000</code>.</p><h3>4.6 Correct raw call data</h3><p>The corrected call is the proxy-wrapped award, laid out byte by byte. It is broken into labelled segments deliberately — <strong>do not paste this back together and submit it.</strong> The account bytes below are placeholders; a reassembled blob would pay whichever account was baked into it, not yours.</p><pre><code>2a 00                    proxy.proxy               (pallet 42, call 0)\n00 &lt;CURATOR_ACCOUNT_ID&gt;  real: MultiAddress::Id    (32 bytes)\n01 07                    force_proxy_type: Some(Governance)\n62 05                    multiAssetBounties.awardBounty  (pallet 98, call 5)\n00                       parent_bounty_id: compact(0)\n01 01000000              child_bounty_id: Some(1)\n05                       beneficiary: V5\n00 00                    location:  parents 0, Here\n00 01 01 00              accountId: parents 0, X1(AccountId32), network None\n&lt;BENEFICIARY_ACCOUNT_ID&gt; (32 bytes)</code></pre><p><code>accountId</code> is a full <code>Location</code>, so it carries <strong>its own <code>parents</code> byte</strong> before <code>X1</code> — that is the leading <code>00</code> on that line. Dropping it shifts the account id one byte right and produces exactly the <code>0x0000008871579f…</code> symptom in 4.5. The award call is 47 bytes with the <code>AccountId32</code> beneficiary; if yours is 46, that byte is what is missing.</p><p>Build your own version in Nova Spektr or Polkadot.js Apps and let it encode from metadata. Use the layout above only to check that what the UI produced has the shape you expect.</p><p>This decodes to:</p><pre><code>proxy.proxy\n  real: &lt;CURATOR_ACCOUNT&gt;\n  force_proxy_type: Governance\n  call:\n    multiAssetBounties.awardBounty\n      parent_bounty_id: &lt;BOUNTY_ID&gt;\n      child_bounty_id: 1\n      beneficiary:\n        V5\n          location:  parents 0, Here\n          accountId: parents 0\n            X1\n              AccountId32\n                network: null\n                id: &lt;BENEFICIARY_ACCOUNT_ID&gt;</code></pre><h3>4.7 Review before submitting</h3><p>Before submitting, confirm:</p><pre><code>method: proxy\nsection: proxy\nreal: &lt;CURATOR_ACCOUNT&gt;\nforce_proxy_type: Governance\nnested call: multiAssetBounties.awardBounty\nparent_bounty_id: &lt;BOUNTY_ID&gt;\nchild_bounty_id: &lt;CHILD_ID&gt;\nbeneficiary id: &lt;BENEFICIARY_HEX&gt;</code></pre><p>Compare that beneficiary id against the one from 4.1 in full, not by its first few characters. Do not submit if it is zeroed:</p><pre><code>beneficiary id: 0x000000...</code></pre><p>or shifted right by a byte or more, which looks like the right id with zeros pushed in front of it.</p><h3>4.8 Submit and collect approvals</h3><p>Submit the operation from any curator multisig signatory.</p><p>After one signatory submits, the remaining signatories must approve before the operation executes — how many depends on this bounty&#x27;s multisig threshold, which the signing UI displays.</p><p>After execution, the child bounty status should move from:</p><pre><code>Active</code></pre><p>to something like:</p><pre><code>PayoutAttempted</code></pre><hr>"}, "s5": {"title": "Step 5 — Confirm Award Execution and Finalize Payout", "html": "<p>After the <code>awardBounty</code> multisig operation is submitted, it must receive enough approvals before execution.</p><p>The award operation follows this structure:</p><pre><code>curator multisig\n  → proxy.proxy\n      → multiAssetBounties.awardBounty</code></pre><p>Once the multisig reaches the threshold, the award call executes and the child bounty should move from:</p><pre><code>Active</code></pre><p>to:</p><pre><code>PayoutAttempted</code></pre><h3>5.1 Check the pending multisig operation</h3><p>To check the pending multisig in Polkadot.js, go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multisig.multisigs(AccountId32, [u8;32])</code></pre><p>Use:</p><pre><code>AccountId32:\n&lt;CURATOR_MULTISIG&gt;</code></pre><p>This is the curator multisig account.</p><p>For the call hash, use the award call hash from Nova Spektr or a Polkadot.js Apps decode.</p><p>Leave the optional block hash field blank.</p><p>Expected result while pending:</p><pre><code>Some(...)</code></pre><p>The result should show details such as the depositor, deposit, timepoint, and approvals.</p><p>If the result is:</p><pre><code>None</code></pre><p>then one of these may be true:</p><pre><code>- the call hash is incorrect\n- the operation already executed\n- the operation failed or was removed\n- the wrong network is selected</code></pre><h3>5.2 Confirm the child bounty status</h3><p>After the multisig reaches threshold and executes, check the child bounty state.</p><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>Expected result after successful award:</p><pre><code>status: PayoutAttempted</code></pre><p>This means the award call executed and the payout process has started.</p><h3>5.3 Finalize/check the payout</h3><p>Once the child bounty shows <code>PayoutAttempted</code>, submit:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Extrinsics</code></pre><p>Use:</p><pre><code>Pallet: multiAssetBounties\nCall: checkStatus</code></pre><p>Set:</p><pre><code>parentBountyId: &lt;BOUNTY_ID&gt;\nchildBountyId: Some(1)</code></pre><p>This does not need to go through the curator multisig. It can be submitted by any curator multisig signatory.</p><h3>5.4 Confirm final state</h3><p>After <code>checkStatus</code> finalizes, query again:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>If the payout succeeded, the child bounty may be removed from storage.</p><p>Possible final results:</p><pre><code>None / no child bounty found</code></pre><p>or a state showing the payout has completed.</p><p>If the bounty still shows:</p><pre><code>PayoutAttempted</code></pre><p>then the payout may still need another status check or further review.</p><h3>5.5 Confirm beneficiary received funds</h3><p>Check the beneficiary account on Kusama Asset Hub:</p><pre><code>&lt;BENEFICIARY_SS58&gt;</code></pre><p>Underlying AccountId32:</p><pre><code>&lt;BENEFICIARY_HEX&gt;</code></pre><p>Confirm the beneficiary received the child bounty&#x27;s full value:</p><pre><code>&lt;CHILD_VALUE&gt; planck</code></pre><p>on Kusama Asset Hub.</p><hr>"}, "issues": {"title": "Common Issues and Notes", "html": "<h3>Priority is too low</h3><p>If a transaction fails with:</p><pre><code>1014: Priority is too low</code></pre><p>there is likely another transaction from the same signer with the same nonce still in the transaction pool.</p><p>Wait a few minutes, refresh the app/wallet, and check whether the earlier transaction finalized or dropped before submitting again.</p><h3>Preimage returns <code>&lt;none&gt;</code></h3><p>If <code>preimage.preimageFor(hash, length)</code> returns:</p><pre><code>&lt;none&gt;</code></pre><p>do not use that metadata hash yet. The preimage is not stored on-chain.</p><h3>Wrong network</h3><p>Always confirm the top-left network is:</p><pre><code>Kusama Asset Hub</code></pre><p>Do not accidentally use:</p><pre><code>Polkadot Asset Hub\nKusama Relay Chain\nPolkadot Relay Chain</code></pre><h3>Parent bounty value vs pot balance</h3><p>Use:</p><pre><code>multiAssetBounties.bounties(&lt;BOUNTY_ID&gt;)</code></pre><p>as the main source of truth for parent bounty allocation/status.</p><p>A separate pot or derived account may hold more DOT, but that does not automatically mean a specific parent bounty can spend it.</p>"}};
+const SECTIONS = {"roles": {"title": "Roles and Terminology", "html": "<h3>Bounty parameters</h3><p>Every step below is written against these three names. Pick the bounty you are working on and read its column; the workbench fills them in automatically for whichever bounty and child you have selected.</p><table><thead><tr><th></th><th><code>0</code> — Proof of Personhood</th><th><code>1</code> — Art &amp; Social Experiments</th><th><code>2</code> — Zero-Knowledge &amp; Cryptography</th></tr></thead><tbody><tr><td><code>BOUNTY_ID</code></td><td><code>0</code></td><td><code>1</code></td><td><code>2</code></td></tr><tr><td><code>CURATOR_ACCOUNT</code></td><td><code>HfMgvo7Lfuymg9sxii2H747rXdts5be6UfLPp6kXS4cNE9u</code></td><td><code>HyfBoVzPkikGdDv5P9pNoMkHrQJ5LvktdXwiv9RntbrTHi4</code></td><td><code>DVYbCSWbNfNxA2DXK1TUJSUaBYZVyeVq6AEvmp98S2nn3LH</code></td></tr><tr><td><code>CURATOR_MULTISIG</code></td><td><code>FhDqdZBwWH16Auzttnc4hurJNVHNZYguMGPWxY2Bjzzxt6G</code></td><td><code>HNAgeYNFWJeNXBoe5Nf5KHLY5q2hp8X2UJNJjFGnrU8YYjw</code></td><td><code>D3LkMK27GeTV924MVcHJHDPwuHrk1jovzvAKKAoh3SJJHed</code></td></tr></tbody></table><h3>Placeholders used below</h3><p>The steps below carry these names wrapped in angle brackets. The workbench replaces each with the real value for whatever bounty and child you have selected; read this file directly on GitHub and they stay as written. Names are listed bare here so the table itself is not substituted.</p><table><thead><tr><th>Name</th><th>Source</th></tr></thead><tbody><tr><td><code>BOUNTY_ID</code></td><td>the bounty you selected — <code>0</code>, <code>1</code> or <code>2</code></td></tr><tr><td><code>CURATOR_ACCOUNT</code></td><td>from <code>multiAssetBounties.bounties(BOUNTY_ID)</code></td></tr><tr><td><code>CURATOR_MULTISIG</code></td><td>from <code>proxy.proxies(CURATOR_ACCOUNT)</code>, the type-<code>7</code> Governance delegate</td></tr><tr><td><code>PARENT_VALUE</code></td><td>the parent bounty&#x27;s allocated value, in planck, from <code>multiAssetBounties.bounties(BOUNTY_ID)</code></td></tr><tr><td><code>PARENT_VALUE_DOT</code></td><td>the same value rendered in DOT</td></tr><tr><td><code>CHILD_ID</code></td><td>the child bounty you selected</td></tr><tr><td><code>CHILD_VALUE</code></td><td>its recorded value, in planck</td></tr><tr><td><code>CHILD_VALUE_DOT</code></td><td>the same value rendered in DOT</td></tr><tr><td><code>CHILD_METADATA</code></td><td>its metadata hash, from the child bounty record</td></tr><tr><td><code>BENEFICIARY_SS58</code> / <code>BENEFICIARY_HEX</code></td><td>read from chain once the child bounty is awarded; <strong>you supply it</strong> beforehand — see 4.1</td></tr><tr><td><code>PREIMAGE_HASH</code></td><td><strong>you supply it</strong> — the hash of the metadata you write in Step 1</td></tr><tr><td><code>PREIMAGE_LEN</code></td><td>the byte length of that metadata, needed for the <code>preimageFor</code> query</td></tr><tr><td><code>CURATOR_ACCOUNT_ID</code></td><td>a structural marker inside a worked example, never filled</td></tr><tr><td><code>BENEFICIARY_ACCOUNT_ID</code></td><td>same, for the beneficiary — 4.6 stays structural so it cannot be reassembled</td></tr></tbody></table><p>The two marked <strong>you supply it</strong> are never auto-filled, because nothing on chain can tell you what they should be. Everything else is read.</p><p>Curator accounts read from <code>multiAssetBounties.bounties(BOUNTY_ID)</code>; multisigs read from <code>proxy.proxies(CURATOR_ACCOUNT)</code>, taking the delegate with proxy type <code>7</code> (Governance). Both queried on Kusama Asset Hub, 23 Aug 2026. Bounty 0&#x27;s entries match the values this document was originally written with, which is what validates the method for the other two.</p><p>Every curator account also carries a second delegate with proxy type <code>0</code> (Any): <code>EFuprYL5sShF5qao4F9hVRrkbutFeoAgn4HHehq4Rkx3ahm</code>. It is the same account across all three bounties and holds unrestricted authority over each curator account — worth knowing about, not something curators act through.</p><p>Where this document says a transaction can be submitted by a <strong>curator multisig signatory</strong>, it means any one of that bounty&#x27;s signatories can initiate or submit it. The operation still needs the bounty&#x27;s threshold in approvals before it executes.</p><h3>Governance proxy</h3><p>The curator multisig uses a <strong>Governance proxy</strong> to act on behalf of the parent curator/proxied account.</p><p>When this document says:</p><pre><code>curator multisig via Governance proxy</code></pre><p>it means the operation should be structured as:</p><pre><code>curator multisig\n  → proxy.proxy\n      real: &lt;CURATOR_ACCOUNT&gt;\n      force_proxy_type: Governance\n      call: &lt;nested call&gt;</code></pre><h3>Signing tool</h3><p>The steps below were written and tested in <strong>Nova Spektr</strong> — the desktop wallet, not Nova Wallet. They are different products from the same team: Nova Wallet is the mobile wallet, Nova Spektr is the desktop client with the multisig and proxy workflow.</p><p>In Nova Spektr the arbitrary-call surface is <strong>Custom operation → Build an operation</strong> — not the multisig transfer/staking flow, and not documented on the docs site at the time of writing. It offers <strong>Paste</strong> for raw call data and <strong>Build</strong> for a metadata-driven form with typed argument fields.</p><p>Nothing in this runbook depends on Nova Spektr specifically. Any client works if it can do all four of these:</p><table><thead><tr><th>Needs to</th><th>Why</th></tr></thead><tbody><tr><td>Connect to Kusama Asset Hub and load current runtime metadata</td><td>the bounty pallet is not in any hardcoded call list; the client has to read it from the chain</td></tr><tr><td>Build an arbitrary pallet call, not just transfers and staking</td><td>every call here comes from <code>multiAssetBounties</code></td></tr><tr><td>Wrap a call in <code>proxy.proxy</code> with an explicit <code>force_proxy_type</code></td><td><code>Governance</code> has to be set deliberately, not defaulted</td></tr><tr><td>Submit as <code>multisig.as_multi</code> and show the call hash and call data</td><td>co-signers verify the hash; the chain stores only the hash, so the last signatory must supply the call data</td></tr></tbody></table><p>Polkadot.js Apps (Developer → Extrinsics) meets all four and is the fallback when a wallet cannot build the nested call. Other multisig clients exist — Mimir, Multix, Signet, Polkasafe — but none of them has been run against these steps. Treat them as untested rather than unsupported.</p><p><strong>If signatories use different clients:</strong> an operation created outside Nova Spektr shows there as an “Unknown” operation, because it cannot decode what it did not build. It can still be signed and executed. Verify it by call hash in that case, not by the description on screen. Operations built through Custom operation do decode by name for everyone on Nova Spektr — <code>Multi asset bounties: Award bounty</code> and so on.</p><hr>"}, "pre": {"title": "Pre-check — Confirm Parent Bounty Status and Funds", "html": "<p>Before creating a child bounty, confirm the parent bounty exists, is active, uses the expected asset, and has enough allocated value.</p><p>For this flow, the parent bounty is:</p><pre><code>parent_bounty_id: &lt;BOUNTY_ID&gt;</code></pre><h3>Check parent bounty storage</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multiAssetBounties.bounties(&lt;BOUNTY_ID&gt;)</code></pre><p>Expected parent bounty state:</p><pre><code>assetKind: DOT on Kusama Asset Hub\nvalue: &lt;current allocation — see note below&gt;\nstatus: Active\ncurator: &lt;CURATOR_ACCOUNT&gt;</code></pre><p><code>value</code> is the amount <strong>allocated to this parent bounty</strong>, not the pot balance. A freshly created bounty starts at <code>10,000,000,000</code> (1 DOT) and stays there until someone calls <code>increaseValue</code>. So a low <code>value</code> alongside a six-figure pot is the normal starting state, not a fault. Compare <code>value</code> against the child bounty you intend to create; if it is lower, run the <code>increaseValue</code> pre-check below first.</p><p>The parent bounty asset should show:</p><pre><code>assetKind:\n  V5:\n    location:\n      parents: 0\n      interior: Here\n    assetId:\n      parents: 2\n      interior:\n        X1:\n          GlobalConsensus: Polkadot</code></pre><p>This represents DOT as a foreign asset on Kusama Asset Hub.</p><h3>Confirm enough value</h3><p>The parent bounty value is:</p><pre><code>&lt;PARENT_VALUE&gt;</code></pre><p>For DOT with 10 decimals, this is:</p><pre><code>&lt;PARENT_VALUE_DOT&gt;</code></pre><p>This is the ceiling for any single child bounty under this parent. Compare it against the amount you intend to create; if the amount is larger, run Step 0 first to raise it.</p><p>Do not create a child bounty if:</p><pre><code>- the parent bounty does not exist\n- the parent bounty is not Active\n- the asset is not the expected DOT asset\n- the parent bounty value is less than the intended child bounty value\n- the curator is not the expected parent curator/proxied account</code></pre><p>Note: a larger DOT balance in a pot or derived account does not necessarily mean it is spendable by a specific parent bounty. Treat the parent bounty <code>value</code> as the spendable allocation for that bounty.</p><hr>"}, "s0": {"title": "Step 0 — Increase the Parent Bounty Value", "html": "<p>Run this step when the parent bounty&#x27;s recorded <code>value</code> is lower than the child bounty you intend to create. Skip it when <code>value</code> already covers the amount.</p><p>This is the normal path after a monthly top-up: DOT arriving in the bounty account does not raise <code>value</code> on its own. The runtime documentation is explicit that the call exists to &quot;register funds that were transferred into the bounty account out-of-band (e.g. recurring external top-ups), so they become available to award or to allocate to child bounties.&quot;</p><h3>0.1 The call</h3><p>Verified against Kusama Asset Hub runtime metadata, 23 Aug 2026:</p><pre><code>multiAssetBounties.increase_value(\n  parent_bounty_id: BountyIndex,     // &lt;BOUNTY_ID&gt;\n  amount:           T::Balance       // the INCREMENT, not the new total\n)</code></pre><p><code>amount</code> is added to the existing <code>value</code>. It is not a new total. To take a bounty sitting at 1 DOT up to 4,000 DOT of headroom, pass <code>amount = 3,999 DOT</code> — or pass 4,000 and accept that <code>value</code> ends at 4,001.</p><p>DOT on Kusama Asset Hub has 10 decimals:</p><pre><code>1 DOT      = 10,000,000,000\n4,000 DOT  = 40,000,000,000,000</code></pre><h3>0.2 Before you call it</h3><p>Four things the runtime enforces or warns about:</p><pre><code>- Origin must be signed by the bounty curator.\n- The bounty must be in the Active state.\n- amount must be greater than 0.\n- value can only be increased, never decreased.</code></pre><p>Two consequences worth understanding before submitting:</p><p><strong>The curator pays an additional deposit.</strong> The curator deposit is re-evaluated against the new value and the difference is collected from the curator account. Confirm <code>&lt;CURATOR_ACCOUNT&gt;</code> holds enough free balance to cover it, or the call fails.</p><p><strong>The call does not check the bounty account actually holds the funds.</strong> It only updates the recorded number. You can raise <code>value</code> above the real balance and the failure will surface later, at award time, not here. Always check the pot balance covers the new value yourself — see the pre-check above.</p><p>Because the increase is irreversible, raise <code>value</code> by what the child bounty needs rather than by the whole pot.</p><h3>0.3 Who calls it, and how</h3><p>The origin must be the bounty curator, so this goes through the same proxy path as every other curator action:</p><pre><code>curator multisig\n  → proxy.proxy\n      real: &lt;CURATOR_ACCOUNT&gt;\n      force_proxy_type: Governance\n      call: multiAssetBounties.increase_value(&lt;BOUNTY_ID&gt;, amount)</code></pre><p>Initiate from any signatory; the operation needs the bounty&#x27;s threshold in approvals before it executes.</p><h3>0.4 Confirm it landed</h3><pre><code>multiAssetBounties.bounties(&lt;BOUNTY_ID&gt;)</code></pre><p>Check <code>value</code> has risen by <code>amount</code> and <code>status</code> is still <code>Active</code>. Only then continue to Step 1.</p><hr>"}, "s1": {"title": "Step 1 — Create and Register the Metadata Preimage", "html": "<p>Before creating a child bounty, create a metadata preimage on <strong>Kusama Asset Hub</strong>. The <code>metadata</code> field in <code>fundChildBounty</code> is an <code>H256</code> hash that points to an on-chain preimage.</p><p>The preimage must be created on <strong>Kusama Asset Hub</strong>, not the Kusama Relay Chain, because the <code>multiAssetBounties</code> pallet is running on Kusama Asset Hub.</p><h3>1.1 Write the metadata</h3><p>The metadata is free text describing the payment, usually a single line:</p><pre><code>First milestone payment for PROJECT NAME</code></pre><p>Keep it simple, descriptive and <strong>unique to this payment</strong>, so it matches your own bounty records. Any change to spacing, punctuation or text produces a different preimage hash — the text and its hash are the same thing.</p><p>Nothing on chain enforces uniqueness, so two child bounties can end up sharing metadata.</p><h3>1.2 Submit the preimage</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Extrinsics</code></pre><p>Use:</p><pre><code>Pallet: preimage\nCall: notePreimage(bytes)\nSubmit from: any curator multisig signatory</code></pre><p>Paste the metadata text into the <code>bytes</code> field.</p><p>Use:</p><pre><code>Submit Transaction</code></pre><p>Do not use <code>Submit Unsigned</code>.</p><h3>1.3 Wait for finalization</h3><p>After submitting, wait until the transaction is:</p><pre><code>Finalized</code></pre><p>If it is only <code>Ready</code> or spinning, wait or check whether the wallet still needs approval.</p><h3>1.4 Confirm the preimage exists</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>preimage.preimageFor((H256, u32))</code></pre><p>The <code>u32</code> is the byte length of the metadata, not a fixed number:</p><pre><code>H256:\n&lt;PREIMAGE_HASH&gt;\n\nu32:\n&lt;PREIMAGE_LEN&gt;</code></pre><p>Expected result:</p><pre><code>Some(0x...)</code></pre><p>or a returned bytes value.</p><p>If it returns:</p><pre><code>&lt;none&gt;</code></pre><p>the preimage is not stored on-chain and should not be used yet.</p><h3>1.5 Use the preimage hash as metadata</h3><p>Once confirmed, use the preimage hash as the <code>metadata</code> value in the child bounty creation call:</p><pre><code>metadata:\n&lt;PREIMAGE_HASH&gt;</code></pre><p>Important: do not use the <code>encoded call hash</code> from the <code>notePreimage</code> form. The metadata hash must be the actual preimage hash confirmed by <code>preimage.preimageFor</code>.</p><hr>"}, "s2": {"title": "Step 2 — Create/Fund the Child Bounty", "html": "<p>After the metadata preimage is confirmed on Kusama Asset Hub, create the child bounty using the curator multisig through the Governance proxy.</p><p>The curator multisig does <strong>not</strong> call <code>fundChildBounty</code> directly. The correct structure is:</p><pre><code>curator multisig\n  → proxy.proxy\n      → multiAssetBounties.fundChildBounty</code></pre><h3>2.1 The next child bounty ID</h3><p>Child ids are handed out in order from zero, so the next one is the number of children this parent has ever had:</p><pre><code>child_bounty_id: &lt;CHILD_ID&gt;</code></pre><p>The workbench reads that from chain and fills it into the steps below, so you should not have to look it up. To confirm it yourself:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state\nQuery: multiAssetBounties.totalChildBountiesPerParent(&lt;BOUNTY_ID&gt;)</code></pre><p>Use <code>totalChildBountiesPerParent</code>, <strong>not</strong> <code>childBountiesPerParent</code>. The second counts only <strong>active</strong> children, so as soon as one is closed it points at an id that is already taken.</p><h3>2.2 Start the operation</h3><p>In Nova Spektr this is <strong>Custom operation → Build an operation</strong>, not the multisig transfer/staking flow. Set:</p><pre><code>Network: Kusama Asset Hub\nSubmit from: &lt;CURATOR_MULTISIG&gt;\nInitiator: any curator multisig signatory</code></pre><p>The dialog then offers <strong>Paste</strong> (raw call data) or <strong>Build</strong> (pick module and call, and fill typed argument fields from metadata). Either works. The workbench emits call data you can paste; Build is the one described below.</p><h3>2.3 Build the outer proxy call</h3><p>Select:</p><pre><code>Pallet: proxy\nCall: proxy</code></pre><p>Set:</p><pre><code>real:\n&lt;CURATOR_ACCOUNT&gt;\n\nforce_proxy_type:\nGovernance</code></pre><p>This means the curator multisig is acting through its Governance proxy over the parent bounty curator/proxied account.</p><p>Some clients derive part of this from the account you submit from and show the route rather than asking you to build it. If yours does, do not also wrap the call by hand — check what it produced against the shape above and make sure the proxy type reads <code>Governance</code>.</p><h3>2.4 Build the nested child bounty call</h3><p>Inside the <code>call</code> field of <code>proxy.proxy</code>, select:</p><pre><code>Pallet: multiAssetBounties\nCall: fundChildBounty</code></pre><p>Use:</p><pre><code>parent_bounty_id: &lt;BOUNTY_ID&gt;\nvalue: &lt;CHILD_VALUE&gt;\nmetadata: &lt;CHILD_METADATA&gt;\ncurator: null</code></pre><p>The value:</p><pre><code>&lt;CHILD_VALUE&gt;</code></pre><p>represents <code>&lt;CHILD_VALUE_DOT&gt;</code> for the DOT asset, assuming 10 decimals.</p><p>In some UIs, the balance field may display as:</p><pre><code>0.001 KSM</code></pre><p>That is acceptable only if the operation preview shows the raw value as:</p><pre><code>&quot;value&quot;: &quot;&lt;CHILD_VALUE&gt;&quot;</code></pre><p>Do not submit if the preview shows:</p><pre><code>&quot;value&quot;: &quot;0&quot;</code></pre><p>or a much larger value.</p><h3>2.5 Use parent curator to reduce steps</h3><p>Set:</p><pre><code>curator: null</code></pre><p>This makes the child bounty use the parent curator by default.</p><p>That reduces the flow because the child bounty should move from:</p><pre><code>FundingAttempted → Active</code></pre><p>after <code>checkStatus</code>.</p><p>If a separate curator is assigned, the flow would be:</p><pre><code>FundingAttempted → Funded → acceptCurator → Active</code></pre><h3>2.6 Review the operation preview</h3><p>The operation should look like this:</p><pre><code>{\n  &quot;method&quot;: &quot;proxy&quot;,\n  &quot;section&quot;: &quot;proxy&quot;,\n  &quot;args&quot;: {\n    &quot;real&quot;: &quot;&lt;CURATOR_ACCOUNT&gt;&quot;,\n    &quot;force_proxy_type&quot;: &quot;Governance&quot;,\n    &quot;call&quot;: {\n      &quot;method&quot;: &quot;fundChildBounty&quot;,\n      &quot;section&quot;: &quot;multiAssetBounties&quot;,\n      &quot;args&quot;: {\n        &quot;parent_bounty_id&quot;: &quot;&lt;BOUNTY_ID&gt;&quot;,\n        &quot;value&quot;: &quot;&lt;CHILD_VALUE&gt;&quot;,\n        &quot;metadata&quot;: &quot;&lt;PREIMAGE_HASH&gt;&quot;,\n        &quot;curator&quot;: null\n      }\n    }\n  }\n}</code></pre><p>Do not submit if:</p><pre><code>force_proxy_type: null</code></pre><p>It must be:</p><pre><code>force_proxy_type: Governance</code></pre><h3>2.7 Submit and collect approvals</h3><p>Submit the operation from any curator multisig signatory.</p><p>After one signatory submits, the operation shows a partial signature count. The remaining signatories must approve before the operation executes — how many depends on this bounty&#x27;s multisig threshold, which the signing UI displays.</p><h3>2.8 Confirm the child bounty was created</h3><p>After the multisig reaches the threshold and executes, go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multiAssetBounties.totalChildBountiesPerParent(0)</code></pre><p>Expected result:</p><pre><code>2</code></pre><p>Then query:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>Expected result:</p><pre><code>parentBounty: &lt;BOUNTY_ID&gt;\nvalue: &lt;CHILD_VALUE&gt;\nmetadata: &lt;CHILD_METADATA&gt;\nstatus: FundingAttempted\ncurator: &lt;CURATOR_ACCOUNT&gt;</code></pre><p>This confirms the child bounty was created successfully and is ready for the funding status check.</p><hr>"}, "s3": {"title": "Step 3 — Check Funding Status", "html": "<p>After the multisig operation executes and the child bounty is created, the child bounty will usually start in this state:</p><pre><code>FundingAttempted</code></pre><p>This means the bounty record exists and the payment/funding attempt has been initiated, but the funding status has not yet been finalized.</p><h3>3.1 Confirm the child bounty state</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>Expected result before checking status:</p><pre><code>parentBounty: &lt;BOUNTY_ID&gt;\nvalue: &lt;CHILD_VALUE&gt;\nmetadata: &lt;CHILD_METADATA&gt;\nstatus: FundingAttempted</code></pre><h3>3.2 Run checkStatus</h3><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Extrinsics</code></pre><p>Use:</p><pre><code>Pallet: multiAssetBounties\nCall: checkStatus</code></pre><p>Set:</p><pre><code>parentBountyId: &lt;BOUNTY_ID&gt;\nchildBountyId: Some(&lt;CHILD_ID&gt;)</code></pre><p>Then submit the transaction from any curator multisig signatory.</p><p>This call does not need to be submitted through the curator multisig. It can be submitted by any signed account.</p><h3>3.3 Confirm the updated state</h3><p>After <code>checkStatus</code> finalizes, query again:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>Expected result:</p><pre><code>status: Active\ncurator: &lt;CURATOR_ACCOUNT&gt;</code></pre><h3>3.4 Why it becomes Active</h3><p>Because the child bounty was created with:</p><pre><code>curator: null</code></pre><p>it uses the parent curator:</p><pre><code>&lt;CURATOR_ACCOUNT&gt;</code></pre><p>That means the flow skips the separate curator acceptance step.</p><p>The expected transition is:</p><pre><code>FundingAttempted → Active</code></pre><p>If a separate curator had been assigned, the transition would usually be:</p><pre><code>FundingAttempted → Funded → acceptCurator → Active</code></pre><hr>"}, "s4": {"title": "Step 4 — Award the Child Bounty to the Beneficiary", "html": "<p>After the child bounty is <code>Active</code>, it can be awarded to a beneficiary.</p><p>For this test, the active child bounty is:</p><pre><code>parent_bounty_id: &lt;BOUNTY_ID&gt;\nchild_bounty_id: &lt;CHILD_ID&gt;\nvalue: &lt;CHILD_VALUE&gt;\nstatus: Active\ncurator: &lt;CURATOR_ACCOUNT&gt;</code></pre><p>Because the curator is the proxied parent curator account, the award must be executed through the curator multisig using the Governance proxy.</p><p>The correct structure is:</p><pre><code>curator multisig\n  → proxy.proxy\n      → multiAssetBounties.awardBounty</code></pre><h3>4.1 Beneficiary account</h3><p>The beneficiary address comes from the applicant, off chain — from the proposal, the Matrix room, or wherever the payout details were agreed. It is <strong>not</strong> derivable from chain state, so if you do not have it yet, stop here and ask for it before going further.</p><p>Confirm it with them in writing before using it. A payout goes to whatever address you put in this field, and it cannot be reversed.</p><pre><code>Beneficiary (SS58, Kusama Asset Hub):  &lt;BENEFICIARY_SS58&gt;</code></pre><p>The <code>AccountId32</code> field takes the 32-byte account id, not the SS58 string, so decode it:</p><pre><code>Polkadot.js  →  Settings → Developer, or any SS58 utility\nResult:  &lt;BENEFICIARY_HEX&gt;   (32 bytes / 64 hex characters)</code></pre><p>Sanity-check the decode by re-encoding the hex back to SS58 and confirming you get the same address the beneficiary gave you. A wrong decode is not obvious by eye and pays the wrong account.</p><h3>4.2 Beneficiary existential deposit note</h3><p>DOT on Kusama Asset Hub is a sufficient foreign asset, so the beneficiary does not need an existing KSM existential deposit just to receive the DOT payout.</p><p>However, the beneficiary may still need fee-paying capability later to move or manage the received funds.</p><h3>4.3 Build the outer proxy call</h3><p>Start the operation as in 2.2 — <strong>Custom operation → Build an operation</strong> on Kusama Asset Hub — then build the proxy wrap as in 2.3:</p><pre><code>Pallet: proxy\nCall: proxy\n\nreal:\n&lt;CURATOR_ACCOUNT&gt;\n\nforce_proxy_type:\nGovernance</code></pre><h3>4.4 Build the nested award call</h3><p>Inside the <code>call</code> field of <code>proxy.proxy</code>, select:</p><pre><code>Pallet: multiAssetBounties\nCall: awardBounty</code></pre><p>Set:</p><pre><code>parent_bounty_id: &lt;BOUNTY_ID&gt;\nchild_bounty_id: &lt;CHILD_ID&gt;</code></pre><p>For the beneficiary, use:</p><pre><code>beneficiary: V5\n\nlocation:\n  parents: 0\n  interior: Here\n\naccountId:\n  parents: 0\n  interior: X1\n    AccountId32:\n      network: null\n      id: &lt;BENEFICIARY_HEX&gt;</code></pre><p>The <code>location: Here</code> means the payment is made on Kusama Asset Hub.</p><p>The <code>accountId</code> is the beneficiary account that will receive the payout.</p><h3>4.5 Nova Spektr beneficiary encoding issue</h3><p>During testing, Nova Spektr sometimes defaulted the beneficiary <code>AccountId32</code> to:</p><pre><code>0x0000000000000000000000000000000000000000000000000000000000000000</code></pre><p>or shifted the account ID to:</p><pre><code>0x0000008871579f...</code></pre><p>Do not submit the operation if the beneficiary is zero or shifted.</p><p>The beneficiary id in the call must match, byte for byte, the id you derived in 4.1:</p><pre><code>&lt;BENEFICIARY_HEX&gt;</code></pre><p>A leading run of zero bytes is the tell. The id should begin with the same bytes your decode produced — not with <code>0x000000</code>.</p><h3>4.6 Correct raw call data</h3><p>The corrected call is the proxy-wrapped award, laid out byte by byte. It is broken into labelled segments deliberately — <strong>do not paste this back together and submit it.</strong> The account bytes below are placeholders; a reassembled blob would pay whichever account was baked into it, not yours.</p><pre><code>2a 00                    proxy.proxy               (pallet 42, call 0)\n00 &lt;CURATOR_ACCOUNT_ID&gt;  real: MultiAddress::Id    (32 bytes)\n01 07                    force_proxy_type: Some(Governance)\n62 05                    multiAssetBounties.awardBounty  (pallet 98, call 5)\n00                       parent_bounty_id: compact(0)\n01 01000000              child_bounty_id: Some(1)\n05                       beneficiary: V5\n00 00                    location:  parents 0, Here\n00 01 01 00              accountId: parents 0, X1(AccountId32), network None\n&lt;BENEFICIARY_ACCOUNT_ID&gt; (32 bytes)</code></pre><p><code>accountId</code> is a full <code>Location</code>, so it carries <strong>its own <code>parents</code> byte</strong> before <code>X1</code> — that is the leading <code>00</code> on that line. Dropping it shifts the account id one byte right and produces exactly the <code>0x0000008871579f…</code> symptom in 4.5. The award call is 47 bytes with the <code>AccountId32</code> beneficiary; if yours is 46, that byte is what is missing.</p><p>Build your own version in Nova Spektr or Polkadot.js Apps and let it encode from metadata. Use the layout above only to check that what the UI produced has the shape you expect.</p><p>This decodes to:</p><pre><code>proxy.proxy\n  real: &lt;CURATOR_ACCOUNT&gt;\n  force_proxy_type: Governance\n  call:\n    multiAssetBounties.awardBounty\n      parent_bounty_id: &lt;BOUNTY_ID&gt;\n      child_bounty_id: 1\n      beneficiary:\n        V5\n          location:  parents 0, Here\n          accountId: parents 0\n            X1\n              AccountId32\n                network: null\n                id: &lt;BENEFICIARY_ACCOUNT_ID&gt;</code></pre><h3>4.7 Review before submitting</h3><p>Before submitting, confirm:</p><pre><code>method: proxy\nsection: proxy\nreal: &lt;CURATOR_ACCOUNT&gt;\nforce_proxy_type: Governance\nnested call: multiAssetBounties.awardBounty\nparent_bounty_id: &lt;BOUNTY_ID&gt;\nchild_bounty_id: &lt;CHILD_ID&gt;\nbeneficiary id: &lt;BENEFICIARY_HEX&gt;</code></pre><p>Compare that beneficiary id against the one from 4.1 in full, not by its first few characters. Do not submit if it is zeroed:</p><pre><code>beneficiary id: 0x000000...</code></pre><p>or shifted right by a byte or more, which looks like the right id with zeros pushed in front of it.</p><h3>4.8 Submit and collect approvals</h3><p>Submit the operation from any curator multisig signatory.</p><p>After one signatory submits, the remaining signatories must approve before the operation executes — how many depends on this bounty&#x27;s multisig threshold, which the signing UI displays.</p><p>After execution, the child bounty status should move from:</p><pre><code>Active</code></pre><p>to something like:</p><pre><code>PayoutAttempted</code></pre><hr>"}, "s5": {"title": "Step 5 — Confirm Award Execution and Finalize Payout", "html": "<p>After the <code>awardBounty</code> multisig operation is submitted, it must receive enough approvals before execution.</p><p>The award operation follows this structure:</p><pre><code>curator multisig\n  → proxy.proxy\n      → multiAssetBounties.awardBounty</code></pre><p>Once the multisig reaches the threshold, the award call executes and the child bounty should move from:</p><pre><code>Active</code></pre><p>to:</p><pre><code>PayoutAttempted</code></pre><h3>5.1 Check the pending multisig operation</h3><p>To check the pending multisig in Polkadot.js, go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multisig.multisigs(AccountId32, [u8;32])</code></pre><p>Use:</p><pre><code>AccountId32:\n&lt;CURATOR_MULTISIG&gt;</code></pre><p>This is the curator multisig account.</p><p>For the call hash, use the award call hash from Nova Spektr or a Polkadot.js Apps decode.</p><p>Leave the optional block hash field blank.</p><p>Expected result while pending:</p><pre><code>Some(...)</code></pre><p>The result should show details such as the depositor, deposit, timepoint, and approvals.</p><p>If the result is:</p><pre><code>None</code></pre><p>then one of these may be true:</p><pre><code>- the call hash is incorrect\n- the operation already executed\n- the operation failed or was removed\n- the wrong network is selected</code></pre><h3>5.2 Confirm the child bounty status</h3><p>After the multisig reaches threshold and executes, check the child bounty state.</p><p>Go to:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Chain state</code></pre><p>Query:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>Expected result after successful award:</p><pre><code>status: PayoutAttempted</code></pre><p>This means the award call executed and the payout process has started.</p><h3>5.3 Finalize/check the payout</h3><p>Once the child bounty shows <code>PayoutAttempted</code>, submit:</p><pre><code>Polkadot.js → Kusama Asset Hub → Developer → Extrinsics</code></pre><p>Use:</p><pre><code>Pallet: multiAssetBounties\nCall: checkStatus</code></pre><p>Set:</p><pre><code>parentBountyId: &lt;BOUNTY_ID&gt;\nchildBountyId: Some(&lt;CHILD_ID&gt;)</code></pre><p>This does not need to go through the curator multisig, and it does not need a signatory either. The pallet documents <code>check_status</code> as <strong>Dispatch Origin: Must be signed</strong> [S] — any signed account with enough KSM for the fee can submit it. A curator submitting it directly is simply the usual case, not a requirement.</p><h3>5.4 Confirm final state</h3><p>After <code>checkStatus</code> finalizes, query again:</p><pre><code>multiAssetBounties.childBounties(&lt;BOUNTY_ID&gt;, &lt;CHILD_ID&gt;)</code></pre><p>If the payout succeeded, the child bounty may be removed from storage.</p><p>Possible final results:</p><pre><code>None / no child bounty found</code></pre><p>or a state showing the payout has completed.</p><p>If the bounty still shows:</p><pre><code>PayoutAttempted</code></pre><p>then the payout may still need another status check or further review.</p><h3>5.5 Confirm beneficiary received funds</h3><p>Check the beneficiary account on Kusama Asset Hub:</p><pre><code>&lt;BENEFICIARY_SS58&gt;</code></pre><p>Underlying AccountId32:</p><pre><code>&lt;BENEFICIARY_HEX&gt;</code></pre><p>Confirm the beneficiary received the child bounty&#x27;s full value:</p><pre><code>&lt;CHILD_VALUE&gt; planck</code></pre><p>on Kusama Asset Hub.</p><hr>"}, "issues": {"title": "Common Issues and Notes", "html": "<h3>Priority is too low</h3><p>If a transaction fails with:</p><pre><code>1014: Priority is too low</code></pre><p>there is likely another transaction from the same signer with the same nonce still in the transaction pool.</p><p>Wait a few minutes, refresh the app/wallet, and check whether the earlier transaction finalized or dropped before submitting again.</p><h3>Preimage returns <code>&lt;none&gt;</code></h3><p>If <code>preimage.preimageFor(hash, length)</code> returns:</p><pre><code>&lt;none&gt;</code></pre><p>do not use that metadata hash yet. The preimage is not stored on-chain.</p><h3>Wrong network</h3><p>Always confirm the top-left network is:</p><pre><code>Kusama Asset Hub</code></pre><p>Do not accidentally use:</p><pre><code>Polkadot Asset Hub\nKusama Relay Chain\nPolkadot Relay Chain</code></pre><h3>Parent bounty value vs pot balance</h3><p>Use:</p><pre><code>multiAssetBounties.bounties(&lt;BOUNTY_ID&gt;)</code></pre><p>as the main source of truth for parent bounty allocation/status.</p><p>A separate pot or derived account may hold more DOT, but that does not automatically mean a specific parent bounty can spend it.</p>"}};
 
-const RPC='wss://kusama-asset-hub-rpc.polkadot.io';
+/* Three endpoints, tried in order. All three were checked to serve the same
+   genesis hash and spec_version before going in this list — a fallback that is
+   quietly a different chain would be worse than no fallback at all. */
+const RPCS=['wss://kusama-asset-hub-rpc.polkadot.io',
+            'wss://rpc-asset-hub-kusama.luckyfriday.io',
+            'wss://asset-hub-kusama-rpc.n.dwellir.com'];
 const FA='0x30e64a56026f4b5e3c2d196283a9a17db99d880ec681799c0cf30e8886371da997b69dec7cf3a4f83de9da212d99f0be02010902';
 const BOUNTIES='0x673607b30ff936734d4c021c4a99196aa37f719efab16103103a0c8c2c784ce1';
 const CHILDREN='0x673607b30ff936734d4c021c4a99196aedfb05b766f199ce00df85317e33050e';
@@ -240,14 +319,18 @@ const STATUS=[
  {n:'Refund attempted',   c:'amber', step:'s5'},
  {n:'Payout attempted',   c:'blue',  step:'s5'},
 ];
-const RAIL=[['pre','Pre-check'],['s0','Step 0'],['s1','Step 1'],['s2','Step 2'],
-            ['s3','Step 3'],['s4','Step 4'],['s5','Step 5']];
+/* Short forms of the runbook's own step titles. The number comes from the .n span,
+   so it is not repeated here. */
+const RAIL=[['pre','Pre-check'],['s0','Increase value'],['s1','Metadata preimage'],
+            ['s2','Create child'],['s3','Check funding'],['s4','Award'],
+            ['s5','Confirm payout']];
 // calls offered per step; steps not listed need a metadata-driven client (complex argument types)
 const BUILDERS={ s0:[[9,'increaseValue']], s3:[[7,'checkStatus'],[3,'acceptCurator'],[4,'unassignCurator']],
                  s5:[[7,'checkStatus'],[8,'retryPayment'],[6,'closeBounty']] };
-const NOVA={ s1:'Preimage registration is done in Polkadot.js Apps — it takes the raw metadata bytes, not a call this page builds.',
-             s2:'fundChildBounty takes H256 and Option&lt;MultiAddress&gt; arguments. Build it in Nova Spektr or Polkadot.js Apps so the UI encodes them from metadata.',
-             s4:'awardBounty takes a VersionedLocatableAccount beneficiary — the exact argument this runbook documents an encoding bug for. Build it in Nova Spektr or Polkadot.js Apps.' };
+const NOVA={
+ s1:['Submitted in Polkadot.js.','This page writes the metadata, hashes it and checks whether the preimage is already registered. Noting it on chain is a <code>preimage.notePreimage</code> submission you make there.'],
+ s2:['Encoded elsewhere.','<code>fundChildBounty</code> takes H256 and Option&lt;MultiAddress&gt; arguments, so build the call in Nova Spektr or Polkadot.js Apps and let the UI encode them from metadata. Every argument it needs is below.'],
+ s4:['Encoded elsewhere.','<code>awardBounty</code> takes a VersionedLocatableAccount beneficiary — the exact argument 4.5 documents an encoding bug for. Build it in Nova Spektr or Polkadot.js Apps; the arguments are below.'] };
 
 /* ── xxhash64 → Twox64Concat ────────────────────────────────────────────── */
 const M=(1n<<64n)-1n,P1=11400714785074694791n,P2=14029467366897019727n,
@@ -278,7 +361,8 @@ function derive(tag,...ix){const a=new Uint8Array(32);let p=0;
 /* ── blake2b + base58 · SS58 decode with checksum. Matched against the
    reference decoder on six known addresses; rejects mistyped, truncated
    and non-base58 input rather than decoding to garbage. ──────────────── */
-// blake2b (BigInt, single-block inputs are all we need for SS58 checksums)
+// blake2b (BigInt). Multi-block: SS58 checksums fit one block, preimage
+// metadata does not — the example in Step 1 is 185 bytes.
 const IV=[0x6a09e667f3bcc908n,0xbb67ae8584caa73bn,0x3c6ef372fe94f82bn,0xa54ff53a5f1d36f1n,
           0x510e527fade682d1n,0x9b05688c2b3e6c1fn,0x1f83d9abfb41bd6bn,0x5be0cd19137e2179n];
 const SIG=[[0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15],[14,10,4,8,9,15,13,6,1,12,0,2,11,7,5,3],
@@ -291,23 +375,31 @@ const M64=(1n<<64n)-1n;
 const rotr=(x,n)=>((x>>n)|(x<<(64n-n)))&M64;
 function blake2b(input,outLen=64){
   const h=IV.slice(); h[0]^=0x01010000n^BigInt(outLen);
-  const block=new Uint8Array(128); block.set(input);
-  const m=[]; for(let i=0;i<16;i++){let v=0n;for(let j=7;j>=0;j--)v=(v<<8n)|BigInt(block[i*8+j]);m.push(v)}
-  const v=[...h,...IV]; v[12]^=BigInt(input.length); v[14]^=M64;   // final block
-  const G=(a,b,c,d,x,y)=>{
+  const G=(v,a,b,c,d,x,y)=>{
     v[a]=(v[a]+v[b]+x)&M64; v[d]=rotr(v[d]^v[a],32n);
     v[c]=(v[c]+v[d])&M64;   v[b]=rotr(v[b]^v[c],24n);
     v[a]=(v[a]+v[b]+y)&M64; v[d]=rotr(v[d]^v[a],16n);
     v[c]=(v[c]+v[d])&M64;   v[b]=rotr(v[b]^v[c],63n);
   };
-  for(let r=0;r<12;r++){const s=SIG[r];
-    G(0,4,8,12,m[s[0]],m[s[1]]); G(1,5,9,13,m[s[2]],m[s[3]]);
-    G(2,6,10,14,m[s[4]],m[s[5]]); G(3,7,11,15,m[s[6]],m[s[7]]);
-    G(0,5,10,15,m[s[8]],m[s[9]]); G(1,6,11,12,m[s[10]],m[s[11]]);
-    G(2,7,8,13,m[s[12]],m[s[13]]); G(3,4,9,14,m[s[14]],m[s[15]]);}
+  const compress=(block,t,last)=>{
+    const m=[]; for(let i=0;i<16;i++){let x=0n;for(let j=7;j>=0;j--)x=(x<<8n)|BigInt(block[i*8+j]);m.push(x)}
+    const v=[...h,...IV];
+    v[12]^=t&M64; v[13]^=(t>>64n)&M64; if(last) v[14]^=M64;
+    for(let r=0;r<12;r++){const s=SIG[r];
+      G(v,0,4,8,12,m[s[0]],m[s[1]]);   G(v,1,5,9,13,m[s[2]],m[s[3]]);
+      G(v,2,6,10,14,m[s[4]],m[s[5]]);  G(v,3,7,11,15,m[s[6]],m[s[7]]);
+      G(v,0,5,10,15,m[s[8]],m[s[9]]);  G(v,1,6,11,12,m[s[10]],m[s[11]]);
+      G(v,2,7,8,13,m[s[12]],m[s[13]]); G(v,3,4,9,14,m[s[14]],m[s[15]]);}
+    for(let i=0;i<8;i++) h[i]^=v[i]^v[i+8];
+  };
+  let t=0n, i=0;
+  /* Every block but the last is compressed unfinalised; the last carries the
+     total length and the finalisation flag. An empty input still has one block. */
+  while(input.length-i>128){ t+=128n; compress(input.slice(i,i+128),t,false); i+=128; }
+  const tail=new Uint8Array(128); tail.set(input.slice(i));
+  t+=BigInt(input.length-i); compress(tail,t,true);
   const out=new Uint8Array(outLen);
-  for(let i=0;i<8;i++){let x=h[i]^v[i]^v[i+8];
-    for(let j=0;j<8;j++){const p=i*8+j; if(p<outLen) out[p]=Number((x>>BigInt(8*j))&0xffn);}}
+  for(let k=0;k<outLen;k++) out[k]=Number((h[k>>3]>>BigInt(8*(k&7)))&0xffn);
   return out;
 }
 const A='123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
@@ -351,31 +443,107 @@ const PALLET=0x62;
 const toHex=a=>'0x'+a.map(b=>b.toString(16).padStart(2,'0')).join('');
 
 /* ── RPC ────────────────────────────────────────────────────────────────── */
-let ws,seq=0;const waiting=new Map();
-const rpc=(m,p=[])=>new Promise((res,rej)=>{const id=++seq;waiting.set(id,{res,rej});
-  ws.send(JSON.stringify({jsonrpc:'2.0',id,method:m,params:p}));
-  setTimeout(()=>{if(waiting.delete(id))rej(new Error('timeout: '+m))},20000)});
-const connect=()=>new Promise((res,rej)=>{ws=new WebSocket(RPC);
-  ws.onmessage=e=>{const m=JSON.parse(e.data),w=waiting.get(m.id);
-    if(w){waiting.delete(m.id);m.error?w.rej(new Error(m.error.message)):w.res(m.result)}};
-  ws.onopen=res;ws.onerror=()=>rej(new Error('connection failed'));
-  ws.onclose=()=>setConn(false,'disconnected')});
+/* A single timeout used to kill the whole page load. Now every call retries, and
+   a retry that finds the socket dead reconnects on the next endpoint — an
+   endpoint having a bad minute is the usual reason a call fails here. */
+let ws,seq=0,ep=0;const waiting=new Map();
+const TIMEOUT=15000, TRIES=3;
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+/* One attempt on the current socket. Resolves or rejects — no retrying here. */
+const send=(m,p)=>new Promise((res,rej)=>{
+  if(!ws||ws.readyState!==1) return rej(new Error('socket closed'));
+  const id=++seq, sock=ws;
+  const t=setTimeout(()=>{if(waiting.delete(id))rej(new Error('timeout'))},TIMEOUT);
+  waiting.set(id,{res,rej,t,sock});
+  try{ sock.send(JSON.stringify({jsonrpc:'2.0',id,method:m,params:p})) }
+  catch(e){ waiting.delete(id); clearTimeout(t); rej(e) }
+});
+
+const openSocket=url=>new Promise((res,rej)=>{
+  let sock,settled=false;
+  const fail=msg=>{if(!settled){settled=true;clearTimeout(t);rej(new Error(msg))}};
+  const t=setTimeout(()=>{try{sock.close()}catch(e){};fail('connect timeout')},TIMEOUT);
+  try{ sock=new WebSocket(url) }catch(e){ return fail(e.message) }
+  /* Replies are matched to the socket that asked, so a late answer from a socket
+     we have already moved on from cannot resolve a call made on the new one. */
+  sock.onmessage=e=>{const m=JSON.parse(e.data),w=waiting.get(m.id);
+    if(w&&w.sock===sock){waiting.delete(m.id);clearTimeout(w.t);
+      m.error?w.rej(new Error(m.error.message)):w.res(m.result)}};
+  sock.onopen=()=>{if(!settled){settled=true;clearTimeout(t);ws=sock;res(sock)}};
+  sock.onerror=()=>fail('connection failed');
+  /* Fail this socket's in-flight calls as soon as it closes, instead of letting
+     each sit out its own timeout — the retry can then reconnect immediately. */
+  sock.onclose=()=>{
+    for(const [id,w] of [...waiting]) if(w.sock===sock){
+      waiting.delete(id); clearTimeout(w.t); w.rej(new Error('socket closed')) }
+    if(ws===sock) setConn(false,'disconnected');
+  };
+});
+
+/* Each endpoint gets one try, starting where the last attempt left off. */
+const connect=async()=>{
+  let last=new Error('no endpoints');
+  for(let i=0;i<RPCS.length;i++,ep++){
+    const url=RPCS[ep%RPCS.length];
+    if(i) setBusy('trying '+url.replace(/^wss:\/\//,''));
+    try{ return await openSocket(url) }catch(e){ last=e }
+  }
+  throw new Error('no endpoint reachable ('+last.message+')');
+};
+
+const rpc=async(m,p=[])=>{
+  let last;
+  for(let a=1;a<=TRIES;a++){
+    try{ return await send(m,p) }
+    catch(e){
+      last=e;
+      if(a===TRIES) break;
+      setRetry(a);
+      await sleep(a*400);
+      /* A dead socket is the common case, and retrying on it is pointless; a
+         socket still open gets one more go before we give up on the call. */
+      if(!ws||ws.readyState!==1){ ep++; try{ await connect() }catch(c){ last=c } }
+    }
+  }
+  throw new Error(m+' failed after '+TRIES+' tries: '+last.message);
+};
 const $=id=>document.getElementById(id);
 const setConn=(ok,t)=>$('conn').innerHTML='<span class="dot '+(ok?'ok':'bad')+'"></span>'+t;
-const setBusy=t=>$('conn').innerHTML='<span class="dot busy"></span>'+t+'…';
+let busyMsg='';
+const setBusy=t=>{busyMsg=t;$('conn').innerHTML='<span class="dot busy"></span>'+t+'…'};
+const setRetry=n=>$('conn').innerHTML='<span class="dot busy"></span>'+busyMsg+' · retry '+n+'…';
 const fmt=p=>(Number(p)/1e10).toLocaleString(undefined,{maximumFractionDigits:4});
+
+/* preimage.preimageFor can be read with a single lookup instead of the manual
+   Chain state query in 1.4. Prefix derived with the same twox128 this file already
+   uses for the bounty maps. */
+const PREIMAGE_FOR='0xd8f314b7f4e6b095f0f8ee4656a448257c7dda85c9c297999fd02215e8c8f9de';
+/* PreimageFor is an Identity map, not blake2_128concat like the bounty maps \u2014 the
+   key is the prefix followed by the raw (hash, len) with no hasher in between.
+   Checked against a live key before this was written. */
+function preimageKey(hashHex,len){
+  return PREIMAGE_FOR+hashHex+hxs(le(len,4));
+}
+const esc=v=>v.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
 
 /* ── state ──────────────────────────────────────────────────────────────── */
 let balances=new Map(), bounties=new Map(), kids=new Map(), nextKid=new Map();
+let faKey=new Map();
 let active=0, sel=null, step='pre';
 let benInput='', benHex='', benSs58='', benFromChain=false;
+let metaText='', metaHash='', metaLen=0;
+let childAmt='', childAmtPlanck=null;
 
 async function loadAll(prog){
-  const batch = async keys => {                    // one round-trip for many keys
-    if(!keys.length) return new Map();
-    const r = await rpc('state_queryStorageAt',[keys]);
+  /* Chunked, so a retry re-sends 250 keys rather than the entire set, and so the
+     request keeps well inside the node's response limits as children accumulate. */
+  const batch = async keys => {
     const m = new Map();
-    for(const ch of (r[0]?.changes||[])) if(ch[1]!==null) m.set(ch[0],ch[1]);
+    for(let i=0;i<keys.length;i+=250){
+      const r = await rpc('state_queryStorageAt',[keys.slice(i,i+250)]);
+      for(const ch of (r[0]?.changes||[])) if(ch[1]!==null) m.set(ch[0],ch[1]);
+    }
     return m;
   };
   const pageKeys = async pre => {
@@ -392,7 +560,7 @@ async function loadAll(prog){
   for(const [k,raw] of faVals){
     const h=raw.slice(2); let v=0n;
     for(let i=15;i>=0;i--) v=(v<<8n)|BigInt(parseInt(h.substr(i*2,2),16));
-    balances.set(k.slice(-64),v);
+    balances.set(k.slice(-64),v); faKey.set(k.slice(-64),k);
   }
 
   prog('reading bounties');
@@ -416,7 +584,7 @@ async function loadAll(prog){
     const key=k.slice(2+64), h=raw.slice(2), par=rdU32(key,8);
     if(!kids.has(par)) kids.set(par,[]);
     const st=parseInt(h.substr(104,2),16);
-    const rec={id:rdU32(key,20),value:rdU128(h,4),meta:h.substr(40,64),status:st};
+    const rec={id:rdU32(key,20),value:rdU128(h,4),meta:h.substr(40,64),status:st,skey:k,raw};
     // PayoutAttempted carries the beneficiary: the 32-byte account id sits just
     // before the 9-byte payment_status trailer. Checked against @polkadot/api
     // for both V4- and V5-encoded beneficiaries.
@@ -431,10 +599,27 @@ async function loadAll(prog){
     if(raw) nextKid.set(b.id, rdU32(raw.slice(2),0)); });
 }
 
+/* A child that settles is deleted from storage, so the live list silently loses it.
+   TotalChildBountiesPerParent still counts it, so every id below that total which is
+   no longer present is a completed child — list them, or the page quietly forgets
+   the only ones that actually finished. */
+function settledIds(bountyId){
+  const total=nextKid.get(bountyId); if(total===undefined) return [];
+  const have=new Set((kids.get(bountyId)||[]).map(c=>c.id)), out=[];
+  for(let i=0;i<total;i++) if(!have.has(i)) out.push(i);
+  return out;
+}
 function renderKids(){
   const list=kids.get(META[active].id)||[];
-  $('kids').innerHTML = (list.length?list.map(c=>{
-    const s=STATUS[c.status]||{n:'unknown',c:''};
+  const gone=settledIds(META[active].id);
+  const rows=list.map(c=>({id:c.id,live:true,c}))
+    .concat(gone.map(i=>({id:i,live:false})))
+    .sort((a,b)=>a.id-b.id);
+  $('kids').innerHTML = (rows.length?rows.map(r=>{
+    if(!r.live) return `<button class="kid gone" data-c="${r.id}" aria-current="${sel===r.id}">`+
+      `<span class="id">#${r.id}</span><span class="pill">Settled</span>`+
+      `<span class="amt">removed</span></button>`;
+    const c=r.c, s=STATUS[c.status]||{n:'unknown',c:''};
     return `<button class="kid" data-c="${c.id}" aria-current="${sel===c.id}">`+
       `<span class="id">#${c.id}</span><span class="pill ${s.c}">${s.n}</span>`+
       `<span class="amt">${fmt(c.value)} DOT</span></button>`}).join('')
@@ -447,6 +632,44 @@ function renderKids(){
    so wipe it whenever the selection moves. */
 function clearBen(){ benInput=''; benHex=''; benSs58=''; benFromChain=false; }
 
+/* A child being planned has no value on chain yet, and nothing else on the page can
+   supply one \u2014 without it the fundChildBounty arguments in Step 2 stay blank. Only
+   shown while planning; an existing child's value is read from its record. */
+function renderAmount(){
+  const m=META[active], box=$('amtBody'), panel=$('amtPanel');
+  if(sel!==null){ panel.style.display='none'; return }
+  panel.style.display='';
+  box.innerHTML=`<p class="bnote">The amount this child bounty will be created for.</p>`+
+    `<input id="amtIn" type="number" min="0" step="any" placeholder="2614" `+
+    `value="${childAmt.replace(/"/g,'&quot;')}">`+
+    `<div id="amtOut"></div>`;
+  $('amtIn').addEventListener('input',onAmt);
+  onAmt();
+}
+
+function onAmt(){
+  const el=$('amtIn'), out=$('amtOut'); if(!el) return;
+  childAmt=el.value.trim();
+  const m=META[active], b=bounties.get(m.id);
+  if(!childAmt){ childAmtPlanck=null; out.innerHTML=''; renderDoc(); return }
+  const n=parseFloat(childAmt);
+  if(!isFinite(n)||n<=0){ childAmtPlanck=null;
+    out.innerHTML='<p class="bnote" style="color:var(--red)">Enter an amount greater than zero.</p>';
+    renderDoc(); return }
+  childAmtPlanck=BigInt(Math.round(n*1e10));
+  const pot=balances.get(derive('mbt',m.id))||0n;
+  let note='';
+  if(b&&childAmtPlanck>b.value)
+    note=`<p class="bnote" style="color:var(--amber)">Larger than the recorded value `+
+      `(${fmt(b.value)} DOT) \u2014 raise it in Step 0 first.</p>`;
+  else if(childAmtPlanck>pot)
+    note=`<p class="bnote" style="color:var(--amber)">Larger than the pot `+
+      `(${fmt(pot)} DOT), so there is not enough to fund it.</p>`;
+  out.innerHTML=`<div class="bval">${fmt(childAmtPlanck)} DOT</div>`+
+    `<div class="bhex">${childAmtPlanck.toLocaleString()} planck</div>`+note;
+  renderDoc();
+}
+
 function renderBeneficiary(){
   const m=META[active];
   const cur = sel===null?null:(kids.get(m.id)||[]).find(c=>c.id===sel);
@@ -458,6 +681,18 @@ function renderBeneficiary(){
     box.innerHTML=`<p class="bnote">Already awarded — read from chain.</p>`+
       `<div class="bval">${benSs58||'(could not encode)'}</div>`+
       `<div class="bhex">0x${benHex}</div>`;
+    return;
+  }
+  /* A settled child's record is gone from current state, so there is nothing to
+     supply and nothing to read — its beneficiary comes back with the history. */
+  if(sel!==null && !cur && settledIds(m.id).includes(sel)){
+    const known=histBen.get(histKey(m.id,sel));
+    if(known){ benFromChain=true; benHex=known.hex; benSs58=known.ss58; }
+    else { benFromChain=false; benHex=''; benSs58=''; }
+    box.innerHTML=known
+      ? `<p class="bnote">Settled — recovered from history.</p>`+
+        `<div class="bval">${known.ss58}</div><div class="bhex">0x${known.hex}</div>`
+      : `<p class="bnote">Settled. Reading the archive for the beneficiary…</p>`;
     return;
   }
   benFromChain=false;
@@ -488,28 +723,56 @@ function onBen(){
 function renderRail(){
   const list=kids.get(META[active].id)||[];
   const cur=sel===null?null:list.find(c=>c.id===sel);
-  const here=cur?(STATUS[cur.status]||{}).step:null;
+  /* A new child starts at the Pre-check, so anchor the marker there rather than
+     leaving the one view that most needs guidance without any. */
+  const here=sel===null?startStep(META[active]):(cur?(STATUS[cur.status]||{}).step:null);
+  /* A status belongs to the child, not to a step \u2014 several statuses map onto the
+     same step and the early steps have none at all. So it is shown only on the row
+     the child actually sits on, where it is read from chain rather than inferred. */
+  const st=cur?(STATUS[cur.status]||null):null;
   $('rail').innerHTML=RAIL.map(([k,label])=>{
     const isHere=k===here;
-    return `<button class="rl ${isHere?'here':''}" data-s="${k}" aria-current="${step===k}">`+
+    const isDone=phaseOf(k)==='done'||stepSatisfied(META[active],k);
+    const tag = !isHere ? ''
+      : st ? `<span class="pill ${st.c}">${st.n}</span>`
+      : sel===null ? '<span class="here-tag">START HERE</span>' : '';
+    return `<button class="rl ${isHere?'here':''} ${isDone?'done':''}" data-s="${k}" aria-current="${step===k}">`+
       `<span class="n">${k==='pre'?'·':k[1]}</span><span>${label}</span>`+
-      (isHere?'<span class="here-tag">YOU ARE HERE</span>':'')+`</button>`}).join('');
+      tag+`</button>`}).join('');
 }
 const CURATORS={0:'HfMgvo7Lfuymg9sxii2H747rXdts5be6UfLPp6kXS4cNE9u',
                 1:'HyfBoVzPkikGdDv5P9pNoMkHrQJ5LvktdXwiv9RntbrTHi4',
                 2:'DVYbCSWbNfNxA2DXK1TUJSUaBYZVyeVq6AEvmp98S2nn3LH'};
 /* Fill runbook placeholders with the bounty and child actually selected, and mark
    them so it is obvious which values are contextual rather than part of the text. */
+/* The record for whatever is selected: live from state, or from the archive for a
+   child that has settled. Same field names either way, so callers do not care. */
+function childRec(m){
+  if(sel===null) return null;
+  return (kids.get(m.id)||[]).find(c=>c.id===sel)
+      || histBen.get(histKey(m.id,sel)) || null;
+}
+
 function subst(html){
   const m=META[active];
   const mark=v=>'<span class="fill">'+v+'</span>';
-  const cur = sel===null?null:(kids.get(m.id)||[]).find(c=>c.id===sel);
+  const rec = childRec(m);
+  /* A settled child has its own value, hash and length, but they arrive with the
+     archive lookup. Until then it must not borrow what is being planned for a
+     different child \u2014 so nothing composed fills in while this is true. */
+  const pending = sel!==null && !rec && settledIds(m.id).includes(sel);
+  const pb=bounties.get(m.id);
   const pairs=[
     ['BOUNTY_ID',        String(m.id)],
+    ['PARENT_VALUE',     pb?pb.value.toLocaleString():null],
+    ['PARENT_VALUE_DOT', pb?fmt(pb.value)+' DOT':null],
     ['CHILD_ID',         sel!==null?String(sel)
                           :(nextKid.has(m.id)?String(nextKid.get(m.id)):null)],
-    ['CHILD_VALUE',      cur?cur.value.toLocaleString():null],
-    ['CHILD_METADATA',   cur?'0x'+cur.meta:null],
+    ['CHILD_VALUE',      rec?rec.value.toLocaleString()
+                            :(pending||!childAmtPlanck?null:childAmtPlanck.toLocaleString())],
+    ['CHILD_VALUE_DOT',  rec?fmt(rec.value)+' DOT'
+                            :(pending||!childAmtPlanck?null:fmt(childAmtPlanck)+' DOT')],
+    ['CHILD_METADATA',   rec?'0x'+rec.meta:(metaHash?'0x'+metaHash:null)],
     ['BENEFICIARY_HEX',  benHex?'0x'+benHex:null],
     ['BENEFICIARY_SS58', benSs58||null],
     ['CURATOR_ACCOUNT',  CURATORS[m.id]],
@@ -522,19 +785,578 @@ function subst(html){
   // values that must never be auto-filled: the curator supplies them, or they are
   // structural markers in a worked example that must not be reassembled and submitted
   const SUPPLY={
-    PREIMAGE_HASH:      'you supply this',
     BENEFICIARY_SS58:   'enter the beneficiary address (left panel)',
     BENEFICIARY_HEX:    'enter the beneficiary address (left panel)',
     CHILD_ID:           'the id this child gets (see 2.1)',
+    CHILD_VALUE:        'the amount you are creating',
+    CHILD_VALUE_DOT:    'the amount you are creating',
+    CHILD_METADATA:     'the preimage hash from Step 1',
+  };
+  /* These are not tasks. They label positions in 4.6's byte layout and are never
+     filled, so they must not wear the same amber as something you have to provide \u2014
+     otherwise Step 4 looks like three jobs when it is one. */
+  const STRUCT={
     CURATOR_ACCOUNT_ID:     'curator account id',
     BENEFICIARY_ACCOUNT_ID: 'beneficiary account id',
   };
+  for(const [k,label] of Object.entries(STRUCT)){
+    const tag='<span class="struct">'+label+'</span>';
+    html=html.split('&lt;'+k+'&gt;').join(tag).split('<'+k+'>').join(tag);
+  }
+  /* A child that exists already has its preimage hash on chain \u2014 it is its
+     metadata. Only a child that does not exist yet takes the composed one, so a
+     hash typed while planning cannot bleed into another child's steps. Marked so
+     metaUpdate can refresh it without a full re-render. */
+  const phv = rec ? '0x'+rec.meta : (pending||!metaHash?null:'0x'+metaHash);
+  const ph = phv
+    ? '<span class="fill ph-hash">'+phv+'</span>'
+    : '<span class="you ph-hash">compose it in Step 1</span>';
+  html=html.split('&lt;PREIMAGE_HASH&gt;').join(ph).split('<PREIMAGE_HASH>').join(ph);
+  /* The byte length that preimageFor is keyed by: from the bytes being composed, or
+     from the stored preimage once an existing child's has been read back. */
+  const pc = rec ? preCache.get(rec.meta) : null;
+  const plv = rec ? (pc&&pc.found?String(pc.len):null)
+                  : (pending||!metaLen?null:String(metaLen));
+  const pl = plv
+    ? '<span class="fill ph-len">'+plv+'</span>'
+    : '<span class="you ph-len">the byte length of the metadata</span>';
+  html=html.split('&lt;PREIMAGE_LEN&gt;').join(pl).split('<PREIMAGE_LEN>').join(pl);
   for(const [k,label] of Object.entries(SUPPLY)){
     const tag='<span class="you">'+label+'</span>';
     html=html.split('&lt;'+k+'&gt;').join(tag).split('<'+k+'>').join(tag);
   }
   return html;
 }
+
+/* Sections the page can fold away: the repeated \u201cgo and query childBounties\u201d
+   lookups, which this page already shows live, plus the two step-4 reference blocks.
+   They stay expanded in the markdown so the file still reads straight through. */
+const FOLD=['2.8','3.1','3.3','4.5','4.6','5.2','5.4'];
+function foldRefs(html){
+  return html.split(/(?=<h3>)/).map(part=>{
+    const num=part.match(/^<h3>([\d.]+)\s/);
+    if(!num||!FOLD.includes(num[1])) return part;
+    const head=part.match(/^<h3>([\s\S]*?)<\/h3>/);
+    if(!head) return part;
+    const body=part.slice(part.indexOf('</h3>')+5);
+    return `<details class="ref-sub"><summary>${head[1]}</summary>`+
+           `<div class="stepbody">${body}</div></details>`;
+  }).join('');
+}
+
+/* Where the selected child sits relative to a step: past it, at it, or short of
+   it. Null when no child is selected, or when its status is one this runbook does
+   not map to a step — in both cases the step renders plain, exactly as before. */
+function phaseOf(key){
+  const m=META[active];
+  if(sel===null) return 'plan';                                     // nothing exists yet
+  if(settledIds(m.id).includes(sel)) return 'done';                 // settled: all of it
+  const cur = (kids.get(m.id)||[]).find(c=>c.id===sel);
+  if(!cur) return null;
+  const here=(STATUS[cur.status]||{}).step; if(!here) return null;
+  const i=RAIL.findIndex(r=>r[0]===key), j=RAIL.findIndex(r=>r[0]===here);
+  if(i<0||j<0) return null;
+  return i<j?'done':i===j?'here':'soon';
+}
+
+/* What we can honestly say about a completed step. We know the child's state now,
+   not what it looked like when the step ran, so this is labelled as current state
+   rather than presented as a record of what that step did. */
+function stepFacts(key,cur,m){
+  const b=bounties.get(m.id), F=[];
+  const dot=v=>v.toLocaleString()+' planck ('+fmt(v)+' DOT)';
+  const status=()=>['status',(STATUS[cur.status]||{n:'unknown'}).n];
+  const ben=()=>{ if(!cur.beneficiary) return null;
+    let a; try{ a=hexToSs58(cur.beneficiary) }catch(e){ a='0x'+cur.beneficiary }
+    return ['beneficiary',a] };
+  /* One or two rows only \u2014 the thing that step produced, not a re-listing of the
+     whole child on every screen. */
+  if(key==='pre'||key==='s0'){ if(b) F.push(['parent value',dot(b.value)]); }
+  if(key==='s1') F.push(['metadata','0x'+cur.meta]);
+  if(key==='s2') F.push(['child id','#'+cur.id],['value',dot(cur.value)]);
+  if(key==='s3') F.push(status());
+  if(key==='s4') F.push(ben()||status());
+  if(key==='s5') F.push(status());
+  return F.filter(Boolean);
+}
+
+/* A child sitting at PayoutAttempted has an award that dispatched but never
+   settled: 5.4 says a settled child may leave storage altogether, and these are
+   all still here. Report what can actually be checked rather than implying done. */
+/* What is actually outstanding in each state, and what moves it on. Transitions are
+   the ones 3.4 documents; the checkStatus behaviour is from the pallet's own docs.
+   `hot` marks a dispatched payment the pallet has not settled \u2014 those get amber. */
+const AWAITING={
+ 0:{hot:true, title:'Awaiting confirmation',
+    lead:'The funding payment dispatched, but the pallet has not settled it.',
+    todo:'Outstanding: run <strong>checkStatus</strong> (3.2). Created with '+
+         '<code>curator: null</code> it moves to <strong>Active</strong>; with a separate '+
+         'curator it moves to <strong>Funded</strong> first.'},
+ 1:{title:'Funded, not yet active',
+    lead:'The funding settled, but a separate curator was assigned and has not accepted.',
+    todo:'Outstanding: the curator runs <strong>acceptCurator</strong> (3.2) to make it '+
+         '<strong>Active</strong>. Only an Active child can be awarded.'},
+ 2:{title:'Curator unassigned',
+    lead:'This child has no curator, so it cannot be awarded as it stands.',
+    todo:'Outstanding: a curator has to be assigned and accept before Step 4.'},
+ 3:{title:'Active \u2014 ready to award',
+    lead:'Funded and active, with nothing outstanding on the funding side.',
+    todo:'Next: award it to the beneficiary in <strong>Step 4</strong>.'},
+ 4:{hot:true, title:'Awaiting confirmation',
+    lead:'The refund dispatched, but the pallet has not settled it.',
+    todo:'Outstanding: run <strong>checkStatus</strong>. Once the refund completes the '+
+         'child is removed from storage.'},
+ 5:{hot:true, title:'Awaiting confirmation',
+    lead:'The award call dispatched, but the pallet has not settled it.',
+    todo:'Outstanding: run <strong>checkStatus</strong> (5.3), then re-check 5.4.'}};
+/* Did the payout actually arrive? Comparing the beneficiary's total against the
+   recorded value proves nothing — they may hold that much for unrelated reasons, or
+   have spent what they received. What does prove it is the balance moving in the
+   very block the payout was attempted, so find that block and diff across it. */
+async function landedCheck(cur,outId){
+  const set=t=>{const el=$(outId); if(el) el.innerHTML=t};
+  try{
+    set('reading chain history\u2026');
+    const head=await rpc('chain_getHeader'), now=parseInt(head.number,16);
+    const hashes=new Map();
+    const bh=async n=>{ if(!hashes.has(n)) hashes.set(n,await rpc('chain_getBlockHash',[n]));
+      return hashes.get(n) };
+    const at=async n=>{ const h=await bh(n); return h?await rpc('state_getStorage',[cur.skey,h]):undefined };
+    /* Halve back until the entry differs, then bisect for the first block holding
+       its current value — that is the block the award landed it in this state. */
+    let probe=now;
+    while(probe>1 && (await at(probe))===cur.raw){ probe=Math.floor(probe/2); set('searching\u2026 '+probe) }
+    let lo=probe, hi=now;
+    while(lo<hi){ const mid=Math.floor((lo+hi)/2);
+      ((await at(mid))===cur.raw)?hi=mid:lo=mid+1; set('narrowing\u2026 '+lo) }
+    const blk=lo, days=(((now-blk)*6)/86400).toFixed(1);
+    /* Resolve the beneficiary's asset key AT THE ATTEMPT BLOCK, not from the current
+       key set. A beneficiary who was paid and later spent it all has their entry
+       reaped, and looking only at today's keys reports that as "never arrived". */
+    const keyAt=async n=>{ const bhash=await bh(n); let ks=[],last=FA;
+      for(;;){ const pg=await rpc('state_getKeysPaged',[FA,500,last,bhash]);
+        if(!pg||!pg.length) break; ks=ks.concat(pg); last=pg[pg.length-1];
+        if(pg.length<500) break; }
+      return ks.find(k=>k.slice(-64)===cur.beneficiary)||null; };
+    let fk=null;
+    if(cur.beneficiary){ set('locating the beneficiary\u2019s DOT account\u2026');
+      fk=await keyAt(blk); if(!fk) fk=await keyAt(blk-1); }
+    let verdict, rows='';
+    if(!fk) verdict='<span class="bad-v">The beneficiary held no DOT account at that block '+
+      '\u2014 nothing arrived at this address.</span>';
+    else{
+      const rd=async n=>{ const h=await bh(n); const v=await rpc('state_getStorage',[fk,h]);
+        if(!v) return 0n; const x=v.slice(2); let o=0n;
+        for(let i=15;i>=0;i--) o=(o<<8n)|BigInt(parseInt(x.substr(i*2,2),16)); return o };
+      const before=await rd(blk-1), after=await rd(blk), d=after-before;
+      rows='<dl><dt>before</dt><dd>'+fmt(before)+' DOT</dd>'+
+           '<dt>after</dt><dd>'+fmt(after)+' DOT</dd>'+
+           '<dt>change</dt><dd>'+(d>=0n?'+':'')+fmt(d)+' DOT</dd></dl>';
+      verdict = d===cur.value
+        ? '<span class="ok-v">Landed \u2014 the beneficiary received exactly the recorded '+
+          'value in this block.</span>'
+        : d===0n
+          ? '<span class="bad-v">No change in this block \u2014 the payout did not reach '+
+            'this address.</span>'
+          : '<span class="bad-v">Balance moved by '+fmt(d)+' DOT, but the recorded value is '+
+            fmt(cur.value)+' DOT.</span>';
+    }
+    set('<div class="ph-s">Payout attempted at block <strong>'+blk.toLocaleString()+
+      '</strong> \u2014 about '+days+' days ago.</div>'+rows+'<div class="ph-todo">'+verdict+'</div>');
+  }catch(e){ set('Could not complete the check: '+e.message) }
+}
+
+/* Rebuild a settled child from archive state: bisect for the last block its entry
+   existed, then decode that final record. Nothing else can show it — the current
+   state no longer holds it at all. */
+async function historyCheck(bountyId,childId,outId){
+  /* Look the node up on every write: render() runs renderDoc twice (the
+     beneficiary panel re-renders it), so a held reference goes stale mid-fetch. */
+  const set=t=>{const el=$(outId); if(el) el.innerHTML=t};
+  try{
+    set('searching chain history\u2026');
+    const key=CHILDREN+t64c(le(bountyId,4))+t64c(le(childId,4));
+    const head=await rpc('chain_getHeader'), now=parseInt(head.number,16);
+    const hashes=new Map();
+    const bh=async n=>{ if(!hashes.has(n)) hashes.set(n,await rpc('chain_getBlockHash',[n]));
+      return hashes.get(n) };
+    const ex=async n=>{ const h=await bh(n); return h?await rpc('state_getStorage',[key,h]):null };
+    /* The entry exists only between creation and removal, so halving the block number
+       would jump clean over that window. Step back in doubling strides instead, which
+       lands inside it however recent or old the removal was. */
+    let stride=1, gone=now, found=-1;
+    while(stride<now){
+      const n=now-stride; if(n<1) break;
+      set('searching\u2026 '+n);
+      if(await ex(n)){ found=n; break }
+      gone=n; stride*=2;
+    }
+    if(found<0) return set('No trace of this child in the history this node retains.');
+    let lo=found, hi=gone;
+    while(lo+1<hi){ const mid=Math.floor((lo+hi)/2);
+      (await ex(mid))?lo=mid:hi=mid; set('narrowing\u2026 '+lo) }
+    const raw=await ex(lo), h=raw.slice(2);
+    const rdU128=(x,i)=>BigInt('0x'+x.substr(i*2,32).match(/../g).reverse().join(''));
+    const st=parseInt(h.substr(104,2),16), val=rdU128(h,4);
+    let ben=null, bh32=null;
+    if(st===5){ const n=h.length/2; bh32=h.slice((n-41)*2,(n-9)*2);
+      try{ ben=hexToSs58(bh32) }catch(e){ ben='0x'+bh32 } }
+    /* Keep the whole record: a settled child is gone from current state, so this is
+       the only source for its value and metadata as well as its beneficiary. */
+    histBen.set(histKey(bountyId,childId),
+      {ss58:ben,hex:bh32,value:val,meta:h.substr(40,64),status:st});
+    const days=(((now-hi)*6)/86400).toFixed(1);
+    set('<dl><dt>last state</dt><dd>'+((STATUS[st]||{n:'unknown'}).n)+'</dd>'+
+        '<dt>value</dt><dd>'+fmt(val)+' DOT</dd>'+
+        '<dt>metadata</dt><dd>0x'+h.substr(40,64)+'</dd>'+
+        (ben?'<dt>beneficiary</dt><dd>'+ben+'</dd>':'')+
+        '<dt>last seen</dt><dd>block '+lo.toLocaleString()+'</dd>'+
+        '<dt>removed at</dt><dd>block '+hi.toLocaleString()+' \u2014 about '+days+' days ago</dd></dl>'+
+        '<div class="ph-todo"><span class="ok-v">Settled and removed by <strong>checkStatus</strong>'+
+        ' \u2014 the pallet deletes a child once its payout or refund completes.</span></div>');
+  }catch(e){ set('Could not read history: '+e.message) }
+}
+
+/* Recovered histories, so switching steps or retyping does not refetch. */
+const histCache=new Map(), histBusy=new Set(), histBen=new Map();
+const histKey=(b,c)=>b+':'+c;
+
+function settledBox(bountyId,childId){
+  const k=histKey(bountyId,childId);
+  const inner = histCache.has(k) ? histCache.get(k)
+    : '<div class="ph-caveat">Reading the archive for this child\u2019s final record\u2026</div>';
+  return `<div class="phase done"><div class="ph-h">\u2713 Settled \u00b7 child #${childId}</div>`+
+    `<div class="ph-s">Completed, and the pallet removed its record \u2014 nothing is left in `+
+    `current state. Its id is retired; the next child here will be #${nextKid.get(bountyId)}.</div>`+
+    `<div id="histOut">${inner}</div></div>`;
+}
+
+/* Nothing is outstanding on a settled child, so the seven-step rail is reference
+   material rather than work. Fetch its history on selection and put the step text
+   behind a single toggle instead of making the reader walk the whole flow. */
+function ensureHistory(bountyId,childId){
+  const k=histKey(bountyId,childId);
+  if(histCache.has(k)||histBusy.has(k)) return;
+  histBusy.add(k);
+  historyCheck(bountyId,childId,'histOut').then(()=>{
+    /* Only keep the result if the reader is still on this child \u2014 otherwise the
+       panel on screen belongs to a different one and would be cached under this key. */
+    const el=$('histOut');
+    if(el && META[active].id===bountyId && sel===childId){
+      histCache.set(k,el.innerHTML); renderBeneficiary(); renderDoc(); }
+    histBusy.delete(k);
+  });
+}
+
+function awaitingBox(cur){
+  const a=AWAITING[cur.status]; if(!a) return '';
+  const rows=[['pallet state',(STATUS[cur.status]||{n:'unknown'}).n+
+                (a.hot?' \u2014 dispatched, not settled':''),false]];
+  rows.push(['recorded value',fmt(cur.value)+' DOT',false]);
+  return `<div class="phase ${a.hot?'wait':'soon'}"><div class="ph-h">`+
+    `${a.hot?'\u25d0':'\u25cb'} ${a.title} \u00b7 child #${cur.id}</div>`+
+    `<div class="ph-s">${a.lead}</div>`+
+    '<dl>'+rows.map(([k,v,w])=>`<dt>${k}</dt><dd class="${w?'warn':''}">${v}</dd>`).join('')+'</dl>'+
+    `<div class="ph-todo">${a.todo}</div>`+
+    (cur.status===5
+      ? `<div class="ph-check"><button class="copy" id="landed">Did the payout land?</button>`+
+        `<div id="landedOut" class="ph-caveat">Checks the beneficiary's balance across the `+
+        `block the payout was attempted in \u2014 a few seconds of history lookups.</div></div>`
+      : '')+`</div>`;
+}
+
+/* Step 0 only matters when the parent's allocated value is short of the child you
+   mean to create. The page knows the value, so answer it rather than leaving the
+   reader to compare two numbers by hand. */
+/* Step 1 in one box: the bytes are hashed here, so the hash is known before
+   anything is submitted \u2014 which also removes the chance of copying the call hash
+   instead of the preimage hash, the mistake 1.5 warns about. */
+/* A child that exists already had its preimage registered, so Step 1 is history for
+   it, not work. The hash is on the child record; the bytes themselves can be read
+   back \u2014 PreimageFor is not keyed by hash alone, so find the key by its hash and
+   take the length from the key itself. */
+const preCache=new Map();
+async function loadPreimage(hash){
+  if(preCache.has(hash)) return preCache.get(hash);
+  let out;
+  try{
+    let keys=[], last=PREIMAGE_FOR;
+    for(;;){ const pg=await rpc('state_getKeysPaged',[PREIMAGE_FOR,500,last]);
+      if(!pg||!pg.length) break; keys=keys.concat(pg); last=pg[pg.length-1];
+      if(pg.length<500) break; }
+    const k=keys.find(x=>x.includes(hash));
+    if(!k) out={found:false};
+    else{
+      const len=parseInt(k.slice(-8).match(/../g).reverse().join(''),16);
+      const v=await rpc('state_getStorage',[k]);
+      if(!v) out={found:false};
+      else{
+        const all=v.slice(2);
+        /* value is compact(len) ++ raw, and len is known, so take the tail. */
+        const raw=all.slice(all.length-len*2);
+        const b=new Uint8Array(len);
+        for(let i=0;i<len;i++) b[i]=parseInt(raw.substr(i*2,2),16);
+        /* Not every preimage is text \u2014 one on these bounties is raw bytes, and
+           showing it as mojibake would misrepresent what is stored. */
+        let txt=null;
+        try{ txt=new TextDecoder('utf-8',{fatal:true}).decode(b) }catch(e){ txt=null }
+        if(txt!==null && /[\u0000-\u0008\u000e-\u001f]/.test(txt)) txt=null;
+        out={found:true,len,text:txt,hex:'0x'+raw};
+      }
+    }
+  }catch(e){ out={error:e.message} }
+  preCache.set(hash,out); return out;
+}
+
+function registeredBox(rec){
+  const c=preCache.get(rec.meta);
+  let body;
+  if(!c) body='<div class="ph-caveat">Reading the registered bytes\u2026</div>';
+  else if(c.error) body='<div class="ph-caveat">Could not read it: '+esc(c.error)+'</div>';
+  else if(!c.found) body='<div class="ph-caveat">The preimage is no longer in storage \u2014 '+
+    'it can be cleared once used. Only the hash on the child bounty record remains.</div>';
+  else body='<dl class="metadl"><dt>bytes</dt><dd>'+c.len+'</dd></dl>'+
+    (c.text===null
+      ? '<div class="ph-caveat">Not text \u2014 the preimage is raw bytes:</div>'+
+        '<pre class="metapre">'+esc(c.hex)+'</pre>'
+      : '<pre class="metapre">'+esc(c.text)+'</pre>');
+  return `<div class="builder"><h3>Metadata already registered</h3>`+
+    `<p class="mnote">This child's preimage was noted before it was created \u2014 nothing `+
+    `to compose. Its hash is the <code>metadata</code> on the child bounty record.</p>`+
+    `<dl class="metadl"><dt>hash</dt><dd>0x${rec.meta}</dd></dl>${body}</div>`;
+}
+
+/* Steps 2 and 4 are built in another client, so the curator transcribes values out of
+   this page. Gather them into one block in the shape the runbook specifies, rather than
+   leaving them scattered through the prose. Raw planck is shown, not a formatted number,
+   so what is on screen is exactly what gets pasted. */
+function planValues(m){
+  const rec=childRec(m);
+  return {
+    childId: sel!==null?sel:(nextKid.has(m.id)?nextKid.get(m.id):null),
+    value:   rec?rec.value:childAmtPlanck,
+    meta:    rec?rec.meta:(metaHash||null),
+    ben:     rec?(rec.beneficiary||rec.hex||null):(benHex||null)
+  };
+}
+const argMissing=t=>`<span class="you">${t}</span>`;
+function argsBox(step,m){
+  const v=planValues(m), L=[];
+  const row=(k,val)=>L.push('  '+k.padEnd(19)+val);
+  L.push('Submit from:       '+m.ms);
+  L.push('proxy.proxy');
+  row('real:',CURATORS[m.id]);
+  row('force_proxy_type:','Governance');
+  if(step==='s2'){
+    L.push('  call: multiAssetBounties.fundChildBounty');
+    L.push('    parent_bounty_id:  '+m.id);
+    L.push('    value:             '+(v.value!==null&&v.value!==undefined
+      ?v.value.toString()+'        ('+fmt(v.value)+' DOT)':'\u2190 enter the value on the left'));
+    L.push('    metadata:          '+(v.meta?'0x'+v.meta:'\u2190 compose it in Step 1'));
+    L.push('    curator:           null');
+  }else{
+    L.push('  call: multiAssetBounties.awardBounty');
+    L.push('    parent_bounty_id:  '+m.id);
+    L.push('    child_bounty_id:   '+(v.childId!==null?v.childId:'\u2190 unknown'));
+    L.push('    beneficiary: V5');
+    L.push('      location:   parents 0, Here');
+    L.push('      accountId:  parents 0, X1 \u2192 AccountId32');
+    L.push('        network:  null');
+    L.push('        id:       '+(v.ben?'0x'+v.ben:'\u2190 enter the beneficiary on the left'));
+  }
+  const text=L.join('\n');
+  const shown=esc(text).replace(/\u2190[^\n]*/g,x=>'<span class="you">'+x.slice(1).trim()+'</span>');
+  return `<div class="builder"><h3>Arguments for this call</h3>`+
+    `<p class="mnote">Everything this step needs, in the order the runbook sets it.</p>`+
+    `<pre class="argpre">${shown}</pre>`+
+    `<button class="copy" id="argCopy">Copy arguments</button></div>`;
+}
+
+function metaBox(m){
+  /* The example goes in the placeholder, not the value. Seeded text would be hashed
+     the moment the box renders, and that hash would flow into Step 2's arguments as
+     though someone had chosen it. */
+  const ex='First milestone payment for PROJECT NAME';
+  return `<div class="builder"><h3>Compose the metadata preimage</h3>`+
+    `<p class="mnote">Hashed over these exact bytes \u2014 every space and comma changes `+
+    `the hash. Keep it unique to this payment so it matches your own bounty records.</p>`+
+    `<textarea id="metaIn" spellcheck="false" rows="4" placeholder="${esc(ex)}">`+
+    `${esc(metaText)}</textarea>`+
+    `<div id="metaOut"></div><div id="metaDupe"></div>`+
+    `<button class="copy" id="metaChk">Is it on chain?</button>`+
+    `<div id="metaChain" class="ph-caveat"></div></div>`;
+}
+
+function metaUpdate(){
+  const el=$('metaIn'); if(!el) return;
+  metaText=el.value;
+  const bytes=new TextEncoder().encode(metaText);
+  metaLen=bytes.length;
+  metaHash=metaLen?hxs(blake2b(bytes,32)):'';
+  const out=$('metaOut');
+  if(out) out.innerHTML = metaLen
+    ? `<dl class="metadl"><dt>bytes</dt><dd>${metaLen}</dd>`+
+      `<dt>preimage hash</dt><dd>0x${metaHash}</dd></dl>`
+    : `<div class="ph-caveat">Enter the metadata to see its length and hash.</div>`;
+  /* Update the placeholder in place rather than re-rendering the doc, which would
+     take the caret out of the textarea on every keystroke. */
+  /* Only repaint these when the composed hash is what they are showing \u2014 for an
+     existing child they carry its on-chain metadata and must not be overwritten. */
+  const m=META[active];
+  const live = sel!==null &&
+    ((kids.get(m.id)||[]).some(c=>c.id===sel) || settledIds(m.id).includes(sel));
+  if(!live){
+    document.querySelectorAll('.ph-hash').forEach(sp=>{
+      sp.className = metaHash?'fill ph-hash':'you ph-hash';
+      sp.textContent = metaHash?'0x'+metaHash:'compose it in Step 1';
+    });
+    document.querySelectorAll('.ph-len').forEach(sp=>{
+      sp.className = metaLen?'fill ph-len':'you ph-len';
+      sp.textContent = metaLen?String(metaLen):'the byte length of the metadata';
+    });
+  }
+  /* Nothing stops two child bounties carrying the same metadata \u2014 two pairs on
+     these bounties already do \u2014 but then neither can be told from the other by
+     its record, so say so while it can still be changed. */
+  const dupe=$('metaDupe');
+  if(dupe){
+    const hits=[];
+    if(metaHash) for(const b of META)
+      for(const c of (kids.get(b.id)||[]))
+        if(c.meta===metaHash) hits.push(b.name+' child #'+c.id);
+    dupe.innerHTML = hits.length
+      ? `<span class="bad-v">Already the metadata of `+
+        `<strong>${hits.join('</strong> and <strong>')}</strong>. Keep it unique to this `+
+        `payment so your records line up.</span>`
+      : '';
+  }
+  const pl=$('planList'); if(pl) pl.innerHTML=planChecklist();
+  const c=$('metaChain'); if(c) c.textContent='';
+}
+
+async function metaCheck(){
+  const out=$('metaChain'); if(!out) return;
+  if(!metaHash){ out.textContent='Enter the metadata first.'; return }
+  out.textContent='checking chain\u2026';
+  try{
+    const v=await rpc('state_getStorage',[preimageKey(metaHash,metaLen)]);
+    out.innerHTML = v
+      ? `<span class="ok-v">Registered on chain \u2014 1.2 to 1.4 are done for these bytes. `+
+        `Use this hash as the child bounty's metadata.</span>`
+      : `<span class="bad-v">Not on chain yet \u2014 submit it in Polkadot.js `+
+        `(preimage \u2192 notePreimage) pasting these exact bytes, then check again.</span>`;
+  }catch(e){ out.textContent='Could not check: '+e.message }
+}
+
+function step0Verdict(){
+  const m=META[active], b=bounties.get(m.id);
+  if(!b) return '';
+  const cur = sel===null?null:(kids.get(m.id)||[]).find(c=>c.id===sel);
+  let need=null, src='';
+  if(cur){ need=cur.value; src='child #'+cur.id+' is '+fmt(cur.value)+' DOT'; }
+  else if(childAmtPlanck){ need=childAmtPlanck; src='this child is '+fmt(need)+' DOT'; }
+  else{
+    const raw=($('ivamt')||{}).value;
+    if(raw&&raw.trim()){ const n=parseFloat(raw);
+      if(isFinite(n)&&n>0){ need=BigInt(Math.round(n*1e10)); src='you entered '+fmt(need)+' DOT'; } }
+  }
+  if(need===null)
+    return '<span class="ph-note">Allocated value is <strong>'+fmt(b.value)+' DOT</strong> \u2014 '+
+      'the ceiling for one child bounty here. Enter an amount below to see whether this step '+
+      'is needed.</span>';
+  return need<=b.value
+    ? '<span class="ok-v">Not needed \u2014 allocated value is '+fmt(b.value)+' DOT and '+src+'.</span>'
+    : '<span class="bad-v">Needed \u2014 allocated value is '+fmt(b.value)+' DOT but '+src+'.</span>';
+}
+
+/* increaseValue registers funds sitting in the pot that are not yet allocated. When
+   the pot is already at or below the recorded value there is nothing unregistered to
+   add, so Step 0 and the value half of the Pre-check are dead weight for that bounty. */
+function unregisteredFunds(m){
+  const b=bounties.get(m.id); if(!b) return null;
+  const pot=balances.get(derive('mbt',m.id))||0n;
+  return pot>b.value ? pot-b.value : 0n;
+}
+/* Start a new child at the first step the chain has not already answered. With the
+   pot fully committed, Pre-check and Step 0 are folded away, so pointing START HERE
+   at them would send the reader to two screens that only say "not needed". */
+/* Pre-check and Step 0 are not merely skippable when nothing is left to register \u2014
+   the condition they exist to establish already holds. So they read as done, in the
+   rail and in the banner, rather than as steps someone chose to ignore. */
+function stepSatisfied(m,key){
+  if(key!=='pre'&&key!=='s0') return false;
+  const uf=unregisteredFunds(m);
+  return uf!==null && uf===0n;
+}
+
+function startStep(m){
+  const uf=unregisteredFunds(m);
+  return (uf===null||uf>0n) ? 'pre' : 's1';
+}
+
+function quietBox(m,key){
+  const b=bounties.get(m.id); if(!b) return '';
+  const pot=balances.get(derive('mbt',m.id))||0n;
+  const over = b.value>pot ? b.value-pot : 0n;
+  const shape = over>0n
+    ? `the recorded value (${fmt(b.value)} DOT) already exceeds the pot `+
+      `(${fmt(pot)} DOT) by ${fmt(over)} DOT`
+    : `the pot (${fmt(pot)} DOT) is fully committed against the recorded value`;
+  const why = key==='s0'
+    ? `<strong>increaseValue</strong> has nothing to register here \u2014 ${shape}.`
+    : `The funds this step asks you to check are in the header above \u2014 ${shape}. `+
+      `Expand for the asset-kind and status checks, which the page does not verify.`;
+  /* Step 0's condition is fully settled; the Pre-check's is only settled for the
+     funds half, so it does not claim more than that. */
+  const head = key==='s0' ? '\u2713 Already satisfied' : '\u2713 Funds confirmed';
+  return `<div class="phase done"><div class="ph-h">${head}</div>`+
+    `<div class="ph-s">${why}</div></div>`;
+}
+
+/* Three things have to come from the curator before a new child can be built, and
+   they are spread across two panels and a step. List them where the reader lands, and
+   tick them off as they arrive, so "what do I still owe this?" is answerable at a
+   glance rather than by walking every step. */
+function planChecklist(){
+  const items=[
+    [!!childAmtPlanck, 'Amount',      'left panel'],
+    [!!metaHash,       'Metadata',    'Step 1'],
+    [!!benHex,         'Beneficiary', 'left panel, needed by Step 4']
+  ];
+  return '<ul class="planlist">'+items.map(([done,what,where])=>
+    `<li class="${done?'done':''}"><span class="tick">${done?'\u2713':'\u25cb'}</span>`+
+    `<strong>${what}</strong> \u2014 ${where}</li>`).join('')+'</ul>';
+}
+
+function planBox(m){
+  const id=nextKid.has(m.id)?'#'+nextKid.get(m.id):'the next id';
+  /* Name the step the rail actually starts on \u2014 on a bounty whose pot is fully
+     committed that is not the Pre-check, and saying otherwise sends the reader to a
+     step this page has already folded away. */
+  const first=(RAIL.find(r=>r[0]===startStep(m))||[,'the first step'])[1];
+  return `<div class="phase soon"><div class="ph-h">\u25cb New child bounty \u00b7 will be ${id}</div>`+
+    `<div class="ph-s">Nothing exists on chain yet \u2014 what you see is a plan, not a `+
+    `record. Supply these, then work through the steps from <strong>${first}</strong>:</div>`+
+    `<div id="planList">${planChecklist()}</div></div>`;
+}
+
+function phaseBox(phase,key,cur,m){
+  if(phase==='done'){
+    const f=stepFacts(key,cur,m);
+    return `<div class="phase done"><div class="ph-h">\u2713 Done \u00b7 child #${cur.id}</div>`+
+      `<div class="ph-s">On chain now for this child:</div>`+
+      (f.length?'<dl>'+f.map(([k,v])=>`<dt>${k}</dt><dd>${v}</dd>`).join('')+'</dl>':'')+`</div>`;
+  }
+  /* No facts listed for an upcoming step: the child's value and metadata are on
+     chain, but nothing this step produces is, and mixing the two would misread. */
+  return `<div class="phase soon"><div class="ph-h">\u25cb Upcoming \u00b7 ahead of child #${cur.id}</div>`+
+    `<div class="ph-s">Values below are prefilled from this child. Nothing this step `+
+    `produces is on chain yet.</div></div>`;
+}
+
+/* Which completed steps the reader has expanded, so that a re-render — the
+   beneficiary box triggers one on every keystroke — does not fold them shut. */
+const expanded=new Set();
 
 function renderDoc(){
   const sec=SECTIONS[step]; if(!sec){$('doc').innerHTML='<p>Not found.</p>';return}
@@ -550,19 +1372,86 @@ function renderDoc(){
         <input id="ivamt" type="number" min="0" step="any" placeholder="3999"></div>
       </div><div id="callout">Choose a call.</div></div>`;
   } else if(NOVA[step]){
-    extra=`<div class="nobuild"><strong style="color:var(--amber)">Not built here.</strong> ${NOVA[step]}</div>`;
+    extra=`<div class="nobuild"><strong style="color:var(--amber)">${NOVA[step][0]}</strong> `+
+      `${NOVA[step][1]}</div>`;
   }
-  $('doc').innerHTML=`<span class="h1x">${sec.title}</span>`+extra+subst(sec.html)+
+  if(step==='s2'||step==='s4') extra+=argsBox(step,META[active]);
+  if(step==='s1'){
+    const mm=META[active], r=childRec(mm);
+    /* A settled child's record arrives with its history. Until it does, say so \u2014
+       offering to compose metadata for a child that has already been through this
+       step would be wrong for the second or two it takes to load. */
+    const settledPending = !r && sel!==null && settledIds(mm.id).includes(sel);
+    extra += r ? registeredBox(r)
+      : settledPending
+        ? `<div class="builder"><h3>Metadata already registered</h3>`+
+          `<p class="mnote">Reading this child\u2019s record from the archive\u2026</p></div>`
+        : metaBox(mm);
+  }
+  const m=META[active];
+  const cur = sel===null?null:(kids.get(m.id)||[]).find(c=>c.id===sel);
+  const phase=phaseOf(step);
+  const isGone = sel!==null && !cur && settledIds(m.id).includes(sel);
+  const quiet = stepSatisfied(m,step) && !isGone && phase!=='done';
+  const banner = isGone ? settledBox(m.id,sel)
+    : quiet ? quietBox(m,step)
+    : !phase ? ''
+    : phase==='plan' ? planBox(m)
+    : phase==='here' ? awaitingBox(cur)
+    : phaseBox(phase,step,cur,m);
+  const body=extra+foldRefs(subst(sec.html));
+  /* A step already passed collapses to its banner. The body stays in the DOM so the
+     call builder inside it keeps working whether or not it is open. */
+  const shown = (phase==='done'||isGone||quiet)
+    ? banner+`<details class="step"${expanded.has(step)?' open':''}>`+
+      `<summary>${isGone?'Show this step for reference'
+                 :quiet?'Show this step anyway':'Show the full step'}</summary>`+
+      `<div class="stepbody">${body}</div></details>`
+    : banner+body;
+  const actionable = phase!=='done' && !isGone && !quiet;
+  const verdict = (step==='s0'&&actionable) ? `<div class="phase s0v" id="s0v">${step0Verdict()}</div>` : '';
+  $('doc').innerHTML=`<span class="h1x">${sec.title}</span>`+verdict+shown+
     `<p style="margin-top:22px;font-size:12.5px;color:var(--tx3)">`+
     `Values shown <span class="fill">like this</span> are live from chain for `+
     `<strong>${META[active].name}</strong>`+(sel===null?'':` · child #${sel}`)+
-    `. Amber marks values you supply yourself. Unfilled placeholders mean nothing is selected yet.</p>`;
+    `. Amber marks values you supply yourself; <span class="struct">grey</span> marks `+
+    `positions in a worked example that are never filled.</p>`;
+  if(step==='s1'){
+    const r=childRec(m);
+    if(r && !preCache.has(r.meta))
+      loadPreimage(r.meta).then(()=>{ if(step==='s1'&&childRec(META[active])===r) renderDoc() });
+  }
+  const ac=$('argCopy');
+  if(ac) ac.onclick=()=>{
+    navigator.clipboard.writeText($('doc').querySelector('.argpre').textContent);
+    ac.textContent='Copied'; setTimeout(()=>ac.textContent='Copy arguments',1400);
+  };
+  if($('metaIn')){
+    $('metaIn').addEventListener('input',metaUpdate);
+    $('metaChk').onclick=metaCheck;
+    metaUpdate();
+  }
+  if(isGone) ensureHistory(m.id,sel);
+  const lb=$('landed');
+  if(lb) lb.onclick=async()=>{lb.disabled=true;lb.textContent='Checking\u2026';
+    await landedCheck(cur,'landedOut'); lb.textContent='Checked';};
+  const det=$('doc').querySelector('details.step');
+  if(det) det.addEventListener('toggle',()=>{det.open?expanded.add(step):expanded.delete(step)});
   // a highlighted <span class="fill"> can leave its <pre> scrolled mid-token
   $('doc').querySelectorAll('pre').forEach(el=>{el.scrollLeft=0});
   if(BUILDERS[step]){
     ['act','child','ivamt'].forEach(i=>$(i)&&$(i).addEventListener('input',buildCall));
+    const sv=$('ivamt'); if(sv) sv.addEventListener('input',()=>{
+      const el=$('s0v'); if(el) el.innerHTML=step0Verdict(); });
     $('act').addEventListener('change',buildCall);
-    if(sel!==null&&$('child')) $('child').value=sel;
+    /* Prefill the child this step is about \u2014 the id it already has, or the one it
+       is going to get. Left blank the call silently targets the parent bounty, which
+       is not what the surrounding text describes. */
+    if($('child')){
+      const id = sel!==null ? sel
+        : (nextKid.has(META[active].id) ? nextKid.get(META[active].id) : null);
+      if(id!==null) $('child').value=id;
+    }
     buildCall();
   }
 }
@@ -583,6 +1472,9 @@ function buildCall(){
       const c=$('child').value.trim(), child=c===''?null:parseInt(c,10);
       bytes=[PALLET,idx,...compact(m.id),...optU32(child)];
       argText=`parent_bounty_id: ${m.id}, child_bounty_id: ${child===null?'None':'Some('+child+')'}`;
+      /* Blank is a legitimate choice \u2014 these calls work on a parent bounty too \u2014
+         but it must not be mistaken for the child the rest of the step is about. */
+      if(child===null) argText+=`  \u2014 this call targets the parent bounty, not a child`;
     }
     out.innerHTML=`<strong style="color:var(--tx)">multiAssetBounties.${name}</strong>`+
       `<div class="mono" style="font-size:12.5px;margin-top:5px">${argText}</div>`+
@@ -600,21 +1492,24 @@ function render(){
   $('pot').innerHTML=fmt(pot)+'<small>DOT</small>';
   $('val').innerHTML=fmt(val)+'<small>DOT</small>';
   $('head').innerHTML=fmt(pot>val?pot-val:0n)+'<small>DOT</small>';
-  renderKids(); renderBeneficiary(); renderRail(); renderDoc(); renderRefs();
+  renderKids(); renderAmount(); renderBeneficiary(); renderRail(); renderDoc(); renderRefs();
 }
 
 /* ── boot ───────────────────────────────────────────────────────────────── */
 $('tabs').innerHTML=META.map((b,i)=>
   `<button class="tab" role="tab" data-i="${i}" aria-selected="${i===0}">${b.name}</button>`).join('');
 $('tabs').onclick=e=>{const t=e.target.closest('.tab');if(!t)return;
-  active=+t.dataset.i;sel=null;step='pre';clearBen();
+  active=+t.dataset.i;sel=null;step=startStep(META[active]);clearBen();
   [...$('tabs').children].forEach((x,i)=>x.setAttribute('aria-selected',i===active));render()};
 $('kids').addEventListener('click',e=>{const k=e.target.closest('.kid');if(!k)return;
   clearBen();
-  if(k.dataset.c==='new'){sel=null;step='pre'}
+  if(k.dataset.c==='new'){sel=null;step=startStep(META[active])}
   else{sel=+k.dataset.c;
     const c=(kids.get(META[active].id)||[]).find(x=>x.id===sel);
-    if(c) step=(STATUS[c.status]||{step:'pre'}).step}
+    /* A settled child has no state to map, so without this it would simply keep
+       whichever step happened to be open \u2014 land it on the step it finished at. */
+    if(c) step=(STATUS[c.status]||{step:'pre'}).step;
+    else if(settledIds(META[active].id).includes(sel)) step='s5';}
   render()});
 $('rail').addEventListener('click',e=>{const r=e.target.closest('.rl');if(!r)return;
   step=r.dataset.s;renderRail();renderDoc()});
@@ -624,7 +1519,10 @@ function renderRefs(){
   $('issues').innerHTML=SECTIONS.issues?subst(SECTIONS.issues.html):'';
 }
 
-(async()=>{
+async function boot(){
+  /* loadAll appends to these, so a retry after a part-finished load has to start
+     from empty or the child list comes back with everything on it twice. */
+  balances=new Map(); bounties=new Map(); kids=new Map(); nextKid=new Map(); faKey=new Map();
   try{
     setBusy('connecting');
     await connect();
@@ -632,10 +1530,15 @@ function renderRefs(){
     const chain=await rpc('system_chain'), head=await rpc('chain_getHeader');
     await loadAll(setBusy);
     setConn(true,`${chain} · #${parseInt(head.number,16).toLocaleString()}`);
+    if(sel===null) step=startStep(META[active]);
     render();
   }catch(e){ setConn(false,'error: '+e.message);
-    $('doc').innerHTML=`<p style="color:var(--red)">${e.message}</p>`+(SECTIONS.pre?SECTIONS.pre.html:''); }
-})();
+    $('doc').innerHTML=`<p style="color:var(--red)">${e.message}</p>`+
+      `<p><button class="copy" id="again">Try again</button></p>`+
+      (SECTIONS.pre?SECTIONS.pre.html:'');
+    $('again').onclick=()=>boot(); }
+}
+boot();
 </script>
 </body>
 </html>

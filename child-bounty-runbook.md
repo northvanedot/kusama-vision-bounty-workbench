@@ -47,11 +47,15 @@ itself is not substituted.
 | `BOUNTY_ID` | the bounty you selected — `0`, `1` or `2` |
 | `CURATOR_ACCOUNT` | from `multiAssetBounties.bounties(BOUNTY_ID)` |
 | `CURATOR_MULTISIG` | from `proxy.proxies(CURATOR_ACCOUNT)`, the type-`7` Governance delegate |
+| `PARENT_VALUE` | the parent bounty's allocated value, in planck, from `multiAssetBounties.bounties(BOUNTY_ID)` |
+| `PARENT_VALUE_DOT` | the same value rendered in DOT |
 | `CHILD_ID` | the child bounty you selected |
 | `CHILD_VALUE` | its recorded value, in planck |
+| `CHILD_VALUE_DOT` | the same value rendered in DOT |
 | `CHILD_METADATA` | its metadata hash, from the child bounty record |
 | `BENEFICIARY_SS58` / `BENEFICIARY_HEX` | read from chain once the child bounty is awarded; **you supply it** beforehand — see 4.1 |
-| `PREIMAGE_HASH` | **you supply it** — the hash you produce in Step 1 |
+| `PREIMAGE_HASH` | **you supply it** — the hash of the metadata you write in Step 1 |
+| `PREIMAGE_LEN` | the byte length of that metadata, needed for the `preimageFor` query |
 | `CURATOR_ACCOUNT_ID` | a structural marker inside a worked example, never filled |
 | `BENEFICIARY_ACCOUNT_ID` | same, for the beneficiary — 4.6 stays structural so it cannot be reassembled |
 
@@ -188,28 +192,17 @@ This represents DOT as a foreign asset on Kusama Asset Hub.
 The parent bounty value is:
 
 ```text
-10,000,000,000
+<PARENT_VALUE>
 ```
 
 For DOT with 10 decimals, this is:
 
 ```text
-1 DOT
+<PARENT_VALUE_DOT>
 ```
 
-The test child bounty value is:
-
-```text
-1,000,000,000
-```
-
-For DOT with 10 decimals, this is:
-
-```text
-0.1 DOT
-```
-
-So the parent bounty has enough allocated value for a `0.1 DOT` child bounty.
+This is the ceiling for any single child bounty under this parent. Compare it against the
+amount you intend to create; if the amount is larger, run Step 0 first to raise it.
 
 Do not create a child bounty if:
 
@@ -317,15 +310,19 @@ Before creating a child bounty, create a metadata preimage on **Kusama Asset Hub
 
 The preimage must be created on **Kusama Asset Hub**, not the Kusama Relay Chain, because the `multiAssetBounties` pallet is running on Kusama Asset Hub.
 
-### 1.1 Create the metadata JSON
+### 1.1 Write the metadata
 
-Example metadata:
+The metadata is free text describing the payment, usually a single line:
 
-```json
-{"title":"Test child bounty #2","description":"Second test of the MultiAssetBounties child bounty flow using parent curator.","amount":"0.1 DOT","parent_bounty_id":<BOUNTY_ID>,"curator":"parent"}
+```text
+First milestone payment for PROJECT NAME
 ```
 
-Keep the metadata simple and descriptive. Any change to spacing, punctuation, or text creates a different preimage hash.
+Keep it simple, descriptive and **unique to this payment**, so it matches your own bounty
+records. Any change to spacing, punctuation or text produces a different preimage hash —
+the text and its hash are the same thing.
+
+Nothing on chain enforces uniqueness, so two child bounties can end up sharing metadata.
 
 ### 1.2 Submit the preimage
 
@@ -343,7 +340,7 @@ Call: notePreimage(bytes)
 Submit from: any curator multisig signatory
 ```
 
-Paste the metadata JSON into the `bytes` field.
+Paste the metadata text into the `bytes` field.
 
 Use:
 
@@ -377,14 +374,14 @@ Query:
 preimage.preimageFor((H256, u32))
 ```
 
-For the example metadata above, use:
+The `u32` is the byte length of the metadata, not a fixed number:
 
 ```text
 H256:
 <PREIMAGE_HASH>
 
 u32:
-185
+<PREIMAGE_LEN>
 ```
 
 Expected result:
@@ -511,10 +508,10 @@ curator: null
 The value:
 
 ```text
-1,000,000,000
+<CHILD_VALUE>
 ```
 
-represents `0.1 DOT` for the DOT asset, assuming 10 decimals.
+represents `<CHILD_VALUE_DOT>` for the DOT asset, assuming 10 decimals.
 
 In some UIs, the balance field may display as:
 
@@ -697,7 +694,7 @@ Set:
 
 ```text
 parentBountyId: <BOUNTY_ID>
-childBountyId: Some(1)
+childBountyId: Some(<CHILD_ID>)
 ```
 
 Then submit the transaction from any curator multisig signatory.
@@ -757,7 +754,7 @@ For this test, the active child bounty is:
 
 ```text
 parent_bounty_id: <BOUNTY_ID>
-child_bounty_id: 1
+child_bounty_id: <CHILD_ID>
 value: <CHILD_VALUE>
 status: Active
 curator: <CURATOR_ACCOUNT>
@@ -1093,10 +1090,10 @@ Set:
 
 ```text
 parentBountyId: <BOUNTY_ID>
-childBountyId: Some(1)
+childBountyId: Some(<CHILD_ID>)
 ```
 
-This does not need to go through the curator multisig. It can be submitted by any curator multisig signatory.
+This does not need to go through the curator multisig, and it does not need a signatory either. The pallet documents `check_status` as **Dispatch Origin: Must be signed** [S] — any signed account with enough KSM for the fee can submit it. A curator submitting it directly is simply the usual case, not a requirement.
 
 ### 5.4 Confirm final state
 
