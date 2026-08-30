@@ -1,8 +1,8 @@
 # Kusama Vision Bounty Workbench
 
-A single static page for curators of the three Kusama Vision bounties. It reads live state
-from Kusama Asset Hub and shows the child-bounty runbook next to it, filled in for whichever
-bounty and child you select.
+A single static page for curators of the three Kusama Vision bounties. It fills the
+child-bounty runbook in from Kusama Asset Hub for whichever bounty and child you select —
+live state for children that exist, archive state for those that have settled.
 
 **→ https://northvanedot.github.io/kusama-vision-bounty-workbench/**
 
@@ -16,6 +16,12 @@ publication.
   `pallet_multi_asset_bounties::ChildBounty` in the live runtime metadata
 - Clicking a child jumps the runbook to the step that child is actually at
 - Runbook placeholders fill in from chain for the selected bounty and child
+- Children that have settled are listed and rebuilt from archive state — value, metadata,
+  beneficiary, and the block they were removed at
+- The metadata preimage behind every child is read back, so a payment shows what it was for
+- Step 1 composes new metadata, hashes it locally and checks whether it is already registered
+- For a payout still unsettled, checks whether the beneficiary's balance actually moved in
+  the block it was attempted
 
 ## What it does not do
 
@@ -32,6 +38,9 @@ exactly the argument class the runbook documents an encoding bug for. Build thos
 (the desktop wallet — not Nova Wallet) under **Custom operation → Build an operation**, or in
 Polkadot.js Apps, where the UI encodes them from runtime metadata. That dialog also has a
 **Paste** tab that takes raw call data, so the hex this page emits goes straight in.
+
+Steps 2 and 4 list every argument those calls need, ready to copy — the page just won't
+encode them.
 
 ## Before you sign anything
 
