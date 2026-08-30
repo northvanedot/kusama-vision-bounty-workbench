@@ -981,20 +981,26 @@ async function historyCheck(bountyId,childId,outId){
     const bh=async n=>{ if(!hashes.has(n)) hashes.set(n,await rpc('chain_getBlockHash',[n]));
       return hashes.get(n) };
     const ex=async n=>{ const h=await bh(n); return h?await rpc('state_getStorage',[key,h]):null };
-    /* The entry exists only between creation and removal, so halving the block number
-       would jump clean over that window. Step back in doubling strides instead, which
-       lands inside it however recent or old the removal was. */
-    let stride=1, gone=now, found=-1;
-    while(stride<now){
-      const n=now-stride; if(n<1) break;
-      set('searching\u2026 '+n);
-      if(await ex(n)){ found=n; break }
-      gone=n; stride*=2;
-    }
-    if(found<0) return set('No trace of this child in the history this node retains.');
-    let lo=found, hi=gone;
+    /* The entry exists only between creation and removal, and probing back in doubling
+       strides can step clean over that window \u2014 it did, for a child whose lifetime was
+       narrower than the gap between two strides. TotalChildBountiesPerParent only ever
+       rises, so bisect on that to find the block this child was created in, which is
+       guaranteed to be inside the window, then bisect forward for the removal. */
+    const rdU32=(x,i)=>parseInt(x.substr(i*2,8).match(/../g).reverse().join(''),16);
+    const totalKey=TOTALKIDS+t64c(le(bountyId,4));
+    const totalAt=async n=>{ const h=await bh(n); if(!h) return 0;
+      const v=await rpc('state_getStorage',[totalKey,h]); return v?rdU32(v.slice(2),0):0 };
+    if(await totalAt(now)<=childId)
+      return set('No trace of this child in the history this node retains.');
+    let lo=1, hi=now;
+    while(lo<hi){ const mid=Math.floor((lo+hi)/2);
+      ((await totalAt(mid))>childId)?hi=mid:lo=mid+1; set('finding when it was created\u2026 '+lo) }
+    const born=lo;
+    if(!(await ex(born)))
+      return set('No trace of this child in the history this node retains.');
+    lo=born; hi=now;
     while(lo+1<hi){ const mid=Math.floor((lo+hi)/2);
-      (await ex(mid))?lo=mid:hi=mid; set('narrowing\u2026 '+lo) }
+      (await ex(mid))?lo=mid:hi=mid; set('finding when it was removed\u2026 '+lo) }
     const raw=await ex(lo), h=raw.slice(2);
     const rdU128=(x,i)=>BigInt('0x'+x.substr(i*2,32).match(/../g).reverse().join(''));
     const st=parseInt(h.substr(104,2),16), val=rdU128(h,4);
