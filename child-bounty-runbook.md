@@ -19,6 +19,22 @@ with monthly top-ups, so re-check rather than trusting the figures above.
 
 > Important: all steps in this document are for **Kusama Asset Hub**. Do not use Polkadot Asset Hub or the Kusama Relay Chain for these steps unless explicitly stated.
 
+## Upstream references
+
+- [`pallet-multi-asset-bounties` **0.7.0** rust docs](https://docs.rs/pallet-multi-asset-bounties/0.7.0/pallet_multi_asset_bounties/pallet/enum.Call.html)
+  — this is the version Kusama Asset Hub actually runs. The chain reports
+  `spec_version 2003002`, which is polkadot-fellows/runtimes `v2.3.2`, and that release's
+  `Cargo.lock` pins `pallet-multi-asset-bounties 0.7.0` from crates.io. [T]
+
+  Read the version, not just the crate. `polkadot-sdk` master is already at `1.0.0`, and
+  docs for it are on docs.rs as `pezpallet-multi-asset-bounties` — a third party's
+  republish of the newer source. Those docs describe code Kusama is not running yet.
+- [Multi-Asset Bounties Now Live on Westend: Testing and Roadmap](https://forum.polkadot.network/t/multi-asset-bounties-now-live-on-westend-testing-and-roadmap/16899) —
+  Polkadot Forum, background and roadmap.
+
+This runbook is the failure-mode companion to those: what we hit running the flow on
+Kusama Asset Hub, not a substitute for the pallet docs.
+
 ---
 
 ## Roles and Terminology

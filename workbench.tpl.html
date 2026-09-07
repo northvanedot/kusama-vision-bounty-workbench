@@ -283,6 +283,7 @@ footer{margin-top:30px;padding-top:16px;border-top:1px solid var(--bd);font-size
       <div class="skel"></div><div class="skel" style="width:92%"></div><div class="skel" style="width:76%"></div></div>
     <details class="ref"><summary>Roles and terminology</summary><div class="doc" id="roles"></div></details>
     <details class="ref"><summary>Common issues and notes</summary><div class="doc" id="issues"></div></details>
+    <details class="ref"><summary>Upstream references</summary><div class="doc" id="upstream"></div></details>
   </div>
 </div>
 
@@ -1523,6 +1524,9 @@ $('rail').addEventListener('click',e=>{const r=e.target.closest('.rl');if(!r)ret
 function renderRefs(){
   $('roles').innerHTML=SECTIONS.roles?subst(SECTIONS.roles.html):'';
   $('issues').innerHTML=SECTIONS.issues?subst(SECTIONS.issues.html):'';
+  /* build-sections gives any unmatched '## ' heading the key 'intro'; the references
+     block is the only one, so that is where it lands. */
+  $('upstream').innerHTML=SECTIONS.intro?subst(SECTIONS.intro.html):'';
 }
 
 async function boot(){
