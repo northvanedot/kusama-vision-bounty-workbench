@@ -96,4 +96,4 @@ Kusama Asset Hub, not a substitute for the pallet docs.
 
 ## Licence
 
-MIT
+MIT.
