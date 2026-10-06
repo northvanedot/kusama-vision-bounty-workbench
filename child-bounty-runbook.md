@@ -717,9 +717,8 @@ parentBountyId: <BOUNTY_ID>
 childBountyId: Some(<CHILD_ID>)
 ```
 
-Then submit the transaction from any curator multisig signatory.
-
-This call does not need to be submitted through the curator multisig. It can be submitted by any signed account.
+Submit it from any account. It does not need the curator multisig, a curator, or a
+signatory — `checkStatus` only requires a signed origin [S].
 
 ### 3.3 Confirm the updated state
 
@@ -780,7 +779,13 @@ status: Active
 curator: <CURATOR_ACCOUNT>
 ```
 
-Because the curator is the proxied parent curator account, the award must be executed through the curator multisig using the Governance proxy.
+When the child was created with `curator: null`, its curator is the proxied parent curator
+account, so the award is executed through the curator multisig using the Governance proxy —
+the path the rest of this step describes.
+
+If the child has **its own curator** — a different account from the parent curator — that
+account calls `awardBounty` directly, with no multisig and no proxy wrapper. The parent
+curator cannot award it: the pallet requires the child's own curator [S].
 
 The correct structure is:
 

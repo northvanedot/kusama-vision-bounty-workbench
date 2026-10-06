@@ -1266,33 +1266,49 @@ function planValues(m){
 }
 const argMissing=t=>`<span class="you">${t}</span>`;
 function argsBox(step,m){
-  const v=planValues(m), L=[];
-  const row=(k,val)=>L.push('  '+k.padEnd(19)+val);
-  L.push('Submit from:       '+m.ms);
-  L.push('proxy.proxy');
-  row('real:',CURATORS[m.id]);
-  row('force_proxy_type:','Governance');
-  if(step==='s2'){
-    L.push('  call: multiAssetBounties.fundChildBounty');
-    L.push('    parent_bounty_id:  '+m.id);
-    L.push('    value:             '+(v.value!==null&&v.value!==undefined
-      ?v.value.toString()+'        ('+fmt(v.value)+' DOT)':'\u2190 enter the value on the left'));
-    L.push('    metadata:          '+(v.meta?'0x'+v.meta:'\u2190 compose it in Step 1'));
-    L.push('    curator:           null');
+  const v=planValues(m), L=[], b=bounties.get(m.id);
+  const parent=b?b.curator:null;
+  let real; try{ real=hexToSs58(parent) }catch(e){ real=CURATORS[m.id] }
+  /* awardBounty is signed by the child's own curator and nobody else [S]. When that is
+     a different account from the parent curator, wrapping it in the parent's proxy
+     fails with RequireCurator, after a full multisig round. fundChildBounty is always
+     the parent curator's, so Step 2 keeps the wrapper. */
+  const rec=step==='s4'?childRec(m):null;
+  const childCur=rec&&rec.raw?curatorOf(rec):null;
+  const direct=!!(childCur && parent && childCur!==parent);
+  let ind;
+  if(direct){
+    L.push('Submit from:       '+hexToSs58(childCur)+'   (this child\u2019s curator, directly)');
+    L.push('call: multiAssetBounties.awardBounty'); ind='  ';
   }else{
-    L.push('  call: multiAssetBounties.awardBounty');
-    L.push('    parent_bounty_id:  '+m.id);
-    L.push('    child_bounty_id:   '+(v.childId!==null?v.childId:'\u2190 unknown'));
-    L.push('    beneficiary: V5');
-    L.push('      location:   parents 0, Here');
-    L.push('      accountId:  parents 0, X1 \u2192 AccountId32');
-    L.push('        network:  null');
-    L.push('        id:       '+(v.ben?'0x'+v.ben:'\u2190 enter the beneficiary on the left'));
+    L.push('Submit from:       '+m.ms);
+    L.push('proxy.proxy');
+    L.push('  real:              '+real);
+    L.push('  force_proxy_type:  Governance');
+    L.push('  call: multiAssetBounties.'+(step==='s2'?'fundChildBounty':'awardBounty')); ind='    ';
+  }
+  const row=(k,val)=>L.push(ind+k.padEnd(19)+val);
+  if(step==='s2'){
+    row('parent_bounty_id:',m.id);
+    row('value:',(v.value!==null&&v.value!==undefined
+      ?v.value.toString()+'        ('+fmt(v.value)+' DOT)':'\u2190 enter the value on the left'));
+    row('metadata:',(v.meta?'0x'+v.meta:'\u2190 compose it in Step 1'));
+    row('curator:','null');
+  }else{
+    row('parent_bounty_id:',m.id);
+    row('child_bounty_id:',(v.childId!==null?v.childId:'\u2190 unknown'));
+    L.push(ind+'beneficiary: V5');
+    L.push(ind+'  location:   parents 0, Here');
+    L.push(ind+'  accountId:  parents 0, X1 \u2192 AccountId32');
+    L.push(ind+'    network:  null');
+    L.push(ind+'    id:       '+(v.ben?'0x'+v.ben:'\u2190 enter the beneficiary on the left'));
   }
   const text=L.join('\n');
   const shown=esc(text).replace(/\u2190[^\n]*/g,x=>'<span class="you">'+x.slice(1).trim()+'</span>');
   return `<div class="builder"><h3>Arguments for this call</h3>`+
-    `<p class="mnote">Everything this step needs, in the order the runbook sets it.</p>`+
+    `<p class="mnote">Everything this step needs, in the order the runbook sets it.`+
+    (direct?` This child has its own curator, so the award comes from that account `+
+      `directly \u2014 no multisig, no proxy. The parent curator cannot award it [S].`:'')+`</p>`+
     `<pre class="argpre">${shown}</pre>`+
     `<button class="copy" id="argCopy">Copy arguments</button></div>`;
 }
