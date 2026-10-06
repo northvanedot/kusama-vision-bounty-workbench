@@ -22,6 +22,9 @@ publication.
 - Step 1 composes new metadata, hashes it locally and checks whether it is already registered
 - For a payout still unsettled, checks whether the beneficiary's balance actually moved in
   the block it was attempted
+- For every call it builds, names who can sign it for the selected child, read from that
+  child's record — including when the child's own curator can sign directly, without the
+  multisig — and offers only the calls the pallet will accept in the child's current state
 
 ## What it does not do
 
@@ -38,6 +41,12 @@ exactly the argument class the runbook documents an encoding bug for. Build thos
 (the desktop wallet — not Nova Wallet) under **Custom operation → Build an operation**, or in
 Polkadot.js Apps, where the UI encodes them from runtime metadata. That dialog also has a
 **Paste** tab that takes raw call data, so the hex this page emits goes straight in.
+
+Where a call has to go through the parent curator, the page also gives the `proxy.proxy`
+call the multisig submits. Its `real` argument is a `MultiAddress`, but only ever the plain
+`::Id` form — a `0x00` tag and the 32-byte curator key the page has just read from chain —
+with `force_proxy_type` set to `Governance`. Checked byte for byte against `@polkadot/api`
+on runtime 2003002; the page warns if the chain has moved to another runtime.
 
 Steps 2 and 4 list every argument those calls need, ready to copy — the page just won't
 encode them.
@@ -64,6 +73,9 @@ import { ApiPromise, WsProvider } from '@polkadot/api';
 const api = await ApiPromise.create({ provider: new WsProvider('wss://kusama-asset-hub-rpc.polkadot.io') });
 console.log(api.tx.multiAssetBounties.increaseValue(0, 39990000000000n).method.toHex());
 // 0x6209000b009cbee55e24 — compare against what the page emits for the same arguments
+console.log(api.tx.proxy.proxy('HfMgvo7Lfuymg9sxii2H747rXdts5be6UfLPp6kXS4cNE9u', 'Governance',
+  api.tx.multiAssetBounties.closeBounty(0, 0)).method.toHex());
+// 0x2a0000e104b438e7893a9f9cbc59e7d057d61a85ed1b88e3a0ebc59733cb89637a5e7c01076206000100000000
 ```
 
 ## Upstream references

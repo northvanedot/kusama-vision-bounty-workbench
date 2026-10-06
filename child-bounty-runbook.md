@@ -145,6 +145,10 @@ still be signed and executed. Verify it by call hash in that case, not by the de
 on screen. Operations built through Custom operation do decode by name for everyone on
 Nova Spektr — `Multi asset bounties: Award bounty` and so on.
 
+**Creating the parent bounty is governance's job, not the curators'.** `fundBounty` requires
+`SpendOrigin` — a treasury spend passed by referendum — and the curator multisig cannot
+submit it [S]. This runbook starts from a parent bounty that already exists and is `Active`.
+
 ---
 
 ## Pre-check — Confirm Parent Bounty Status and Funds
@@ -1212,3 +1216,37 @@ multiAssetBounties.bounties(<BOUNTY_ID>)
 as the main source of truth for parent bounty allocation/status.
 
 A separate pot or derived account may hold more DOT, but that does not automatically mean a specific parent bounty can spend it.
+
+### A Funded child that will never go ahead
+
+A child stuck in `Funded` — its proposed curator never accepted, or it was created by
+mistake — does not expire on its own. Cancel it with:
+
+```text
+multiAssetBounties.closeBounty(<BOUNTY_ID>, Some(<CHILD_ID>))
+```
+
+The pallet accepts it while the child is `Funded`, `Active` or `CuratorUnassigned`, and
+refunds the value to the parent bounty. It rejects it in any of the `…Attempted` states [S].
+
+It can be signed by the child's own curator or by the parent curator [S]. When the child's
+curator is a different account from the parent curator, that account can close it
+directly, with no multisig round.
+
+`closeBounty` leaves the child in `RefundAttempted`. Run `checkStatus` on it afterwards —
+any account can — and once the refund has gone through the child is removed from
+storage [S]. A child sitting in `RefundAttempted` has been cancelled but not cleared.
+
+### Closing a parent bounty
+
+`closeBounty(<BOUNTY_ID>, None)` closes the parent itself. The pallet refuses it while the
+parent has any active child bounties, so every child has to be settled or closed first [S].
+
+### A signer has left the multisig
+
+A multisig's threshold does not drop when a signer leaves. If the threshold now equals the
+number of signers still active, every operation needs every one of them, and one person
+being away blocks everything the parent curator has to sign. Rebuild the multisig, and
+until then prefer the routes the pallet allows without it: `checkStatus` and
+`retryPayment` from any account, and the calls a separate child curator can sign
+itself [S].

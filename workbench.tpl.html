@@ -214,6 +214,14 @@ details.ref-sub .stepbody{padding:0 16px 12px}
 .planlist .tick{color:var(--tx3);font-family:var(--f-mono)}
 .planlist li.done .tick{color:var(--cyan)}
 .planlist li.done strong{color:var(--tx2)}
+.signers{margin-top:12px;padding-top:11px;border-top:1px solid var(--bd);font-size:13px;color:var(--tx2)}
+.signers .sg-h{font-family:var(--f-disp);font-size:11px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--tx3);margin-bottom:6px}
+.signers p{margin:0 0 7px}
+.signers ul{margin:0 0 6px;padding-left:18px}
+.signers li{margin:3px 0}
+.signers .sg-fast{color:var(--cyan)}
+.signers .sg-sub{margin-top:9px;font-size:12.5px;color:var(--tx3)}
 .phase .ph-check{margin-top:11px}
 .phase .ph-check .copy{margin-bottom:7px}
 .phase .ok-v{color:var(--cyan)} .phase .bad-v{color:var(--amber)}
@@ -326,8 +334,10 @@ const RAIL=[['pre','Pre-check'],['s0','Increase value'],['s1','Metadata preimage
             ['s2','Create child'],['s3','Check funding'],['s4','Award'],
             ['s5','Confirm payout']];
 // calls offered per step; steps not listed need a metadata-driven client (complex argument types)
-const BUILDERS={ s0:[[9,'increaseValue']], s3:[[7,'checkStatus'],[3,'acceptCurator'],[4,'unassignCurator']],
-                 s5:[[7,'checkStatus'],[8,'retryPayment'],[6,'closeBounty']] };
+const BUILDERS={ s0:[[9,'increaseValue']],
+                 s3:[[7,'checkStatus'],[3,'acceptCurator'],[4,'unassignCurator'],[6,'closeBounty']],
+                 s4:[[6,'closeBounty']],
+                 s5:[[7,'checkStatus'],[8,'retryPayment']] };
 const NOVA={
  s1:['Submitted in Polkadot.js.','This page writes the metadata, hashes it and checks whether the preimage is already registered. Noting it on chain is a <code>preimage.notePreimage</code> submission you make there.'],
  s2:['Encoded elsewhere.','<code>fundChildBounty</code> takes H256 and Option&lt;MultiAddress&gt; arguments, so build the call in Nova Spektr or Polkadot.js Apps and let the UI encode them from metadata. Every argument it needs is below.'],
@@ -441,6 +451,106 @@ function compact(v){v=BigInt(v);
   return[((b.length-4)<<2)|3,...b]}
 const optU32=v=>(v===null||v===undefined||v==='')?[0]:[1,v&0xff,(v>>>8)&0xff,(v>>>16)&0xff,(v>>>24)&0xff];
 const PALLET=0x62;
+/* proxy.proxy on Kusama Asset Hub is pallet 42, call 0, and ProxyType::Governance
+   encodes as 7. Runtime-specific like PALLET: checked byte for byte against
+   @polkadot/api on spec 2003002, and flagged on the page if the chain moves on. */
+const PROXY=[0x2a,0x00], GOVERNANCE=0x07, VERIFIED_SPEC=2003002;
+let specVersion=null;
+const hexBytes=h=>h.match(/../g).map(x=>parseInt(x,16));
+/* MultiAddress::Id is a 0x00 tag then the 32-byte key. That is the only form this page
+   emits, and only for a curator it has just read from chain. */
+const proxyWrap=(realHex,inner)=>[...PROXY,0x00,...hexBytes(realHex),0x01,GOVERNANCE,...inner];
+
+/* The states each call is accepted in, from the 0.7.0 source [S]. Offering one the
+   pallet will reject costs a multisig round to find out: closeBounty used to be
+   offered only on Step 5, the one step where it can never succeed. */
+const VALID={3:[1], 4:[1,3], 6:[1,2,3], 7:[0,4,5], 8:[0,4,5]};
+
+/* FundingAttempted, Funded, Active and PayoutAttempted carry the curator straight after
+   the status byte; RefundAttempted carries it as an Option; CuratorUnassigned has none [S]. */
+function curatorOf(rec){
+  if(!rec||!rec.raw) return null;
+  const h=rec.raw.slice(2);
+  if([0,1,3,5].includes(rec.status)) return h.substr(106,64);
+  if(rec.status===4) return h.substr(106,2)==='01'?h.substr(108,64):null;
+  return null;
+}
+const shortAcct=hex=>{ let a; try{ a=hexToSs58(hex) }catch(e){ return '0x'+hex.slice(0,8)+'\u2026' }
+  return a.slice(0,4)+'\u2026'+a.slice(-4) };
+
+/* Who can actually sign a call for this child, from the origin checks in the source
+   rather than one blanket "wrap it in the multisig" line. A child curator that is a
+   different account from the parent curator can sign its own calls directly, which
+   is the fast route and the one most worth saying out loud. */
+function signerBox(idx,m,childId,bytes){
+  const b=bounties.get(m.id), parent=b&&b.curator;
+  const rec=childId===null?null:(kids.get(m.id)||[]).find(c=>c.id===childId);
+  const planned=!rec && childId!==null && !settledIds(m.id).includes(childId);
+  // a planned child is created with curator: null, which makes it the parent curator
+  const child=rec?curatorOf(rec):(planned?parent:null);
+  const routes=[], P=why=>({acct:parent,why}), C=why=>({acct:child,why});
+  let reject=false;
+  if(idx===7||idx===8)
+    return `<div class="signers"><div class="sg-h">Who can sign</div>`+
+      `<p>Any signed account \u2014 no curator and no multisig needed [S].</p></div>`;
+  if(idx===3) routes.push(C('the proposed curator \u2014 the only account that can accept'));
+  if(idx===4){
+    reject=true;
+    if(rec&&rec.status===3){
+      routes.push(C('this child\u2019s curator, giving the role up \u2014 its deposit is returned'));
+      if(child!==parent) routes.push(P('the parent curator \u2014 this burns the child curator\u2019s deposit'));
+    }else{
+      routes.push(C('the proposed curator'));
+      if(child!==parent) routes.push(P('the parent curator \u2014 nothing is burned while the child is Funded'));
+    }
+  }
+  if(idx===6){
+    reject=true;
+    if(childId===null) routes.push(P('the parent bounty\u2019s curator, once the bounty has no active children'));
+    else{
+      if(child) routes.push(C('this child\u2019s curator'));
+      if(child!==parent) routes.push(P('the parent curator'));
+    }
+  }
+  if(idx===9) routes.push(P('the parent bounty\u2019s curator'));
+  const live=routes.filter(r=>r.acct);
+  if(!live.length) return '';
+  const viaMs=live.some(r=>r.acct===parent);
+  const direct=live.find(r=>r.acct!==parent);
+  let html=`<div class="signers"><div class="sg-h">Who can sign</div>`;
+  if(direct && viaMs)
+    html+=`<p class="sg-fast">This child\u2019s curator is a different account from the parent `+
+      `curator, so <strong>${shortAcct(direct.acct)}</strong> can sign it directly \u2014 `+
+      `the fast route, no multisig round.</p>`;
+  if(planned)
+    html+=`<p>As planned with <code>curator: null</code>, this child\u2019s curator will be `+
+      `the parent curator.</p>`;
+  html+='<ul>'+live.map(r=> r.acct===parent
+      ? `<li><strong>${shortAcct(r.acct)}</strong> \u2014 ${r.why}, through the multisig `+
+        `<strong>${shortAcct(ss58ToHex(m.ms))}</strong> (proxy.proxy, Governance)</li>`
+      : `<li><strong>${shortAcct(r.acct)}</strong> \u2014 ${r.why}, signing from that `+
+        `account</li>`).join('')+
+    (reject?'<li>or governance, through a referendum (RejectOrigin)</li>':'')+'</ul>';
+  if(viaMs){
+    const w=proxyWrap(parent,bytes);
+    html+=`<div class="sg-sub">Call data for the multisig \u2014 proxy.proxy(real `+
+      `${shortAcct(parent)}, Governance, this call):</div>`+
+      `<code class="callhex">${toHex(w)}</code><button class="copy" id="cpw">Copy multisig call data</button>`+
+      (specVersion!==null && specVersion!==VERIFIED_SPEC
+        ? `<div class="verify">This wrapper was verified against runtime ${VERIFIED_SPEC}; `+
+          `the chain is now on ${specVersion}. Decode it before trusting it.</div>` : '');
+  }
+  return html+'</div>';
+}
+
+/* The calls a step's builder should offer for the child selected. */
+function callsFor(stp){
+  const m=META[active], list=BUILDERS[stp]||[];
+  if(sel===null) return list.filter(([i])=>i!==6);           // nothing exists yet to close
+  const cur=(kids.get(m.id)||[]).find(c=>c.id===sel);
+  if(!cur) return [];                                         // settled: gone from storage
+  return list.filter(([i])=>!VALID[i]||VALID[i].includes(cur.status));
+}
 const toHex=a=>'0x'+a.map(b=>b.toString(16).padStart(2,'0')).join('');
 
 /* ── RPC ────────────────────────────────────────────────────────────────── */
@@ -896,13 +1006,20 @@ const AWAITING={
  1:{title:'Funded, not yet active',
     lead:'The funding settled, but a separate curator was assigned and has not accepted.',
     todo:'Outstanding: the curator runs <strong>acceptCurator</strong> (3.2) to make it '+
-         '<strong>Active</strong>. Only an Active child can be awarded.'},
+         '<strong>Active</strong>. Only an Active child can be awarded.',
+    cancel:'Not going ahead? <strong>closeBounty</strong> on this step cancels it and refunds '+
+           'the value to the parent bounty.'},
  2:{title:'Curator unassigned',
     lead:'This child has no curator, so it cannot be awarded as it stands.',
-    todo:'Outstanding: a curator has to be assigned and accept before Step 4.'},
+    todo:'Outstanding: the parent curator proposes one with <strong>proposeCurator</strong> '+
+         '(arguments below), and that account then runs <strong>acceptCurator</strong>.',
+    cancel:'Not going ahead? <strong>closeBounty</strong> on this step cancels it and refunds '+
+           'the value to the parent bounty.'},
  3:{title:'Active \u2014 ready to award',
     lead:'Funded and active, with nothing outstanding on the funding side.',
-    todo:'Next: award it to the beneficiary in <strong>Step 4</strong>.'},
+    todo:'Next: award it to the beneficiary in <strong>Step 4</strong>.',
+    cancel:'Not going ahead? <strong>closeBounty</strong> in Step 4 cancels it and refunds '+
+           'the value to the parent bounty.'},
  4:{hot:true, title:'Awaiting confirmation',
     lead:'The refund dispatched, but the pallet has not settled it.',
     todo:'Outstanding: run <strong>checkStatus</strong>. Once the refund completes the '+
@@ -1065,6 +1182,7 @@ function awaitingBox(cur){
     `<div class="ph-s">${a.lead}</div>`+
     '<dl>'+rows.map(([k,v,w])=>`<dt>${k}</dt><dd class="${w?'warn':''}">${v}</dd>`).join('')+'</dl>'+
     `<div class="ph-todo">${a.todo}</div>`+
+    (a.cancel?`<div class="ph-caveat">${a.cancel}</div>`:'')+
     (cur.status===5
       ? `<div class="ph-check"><button class="copy" id="landed">Did the payout land?</button>`+
         `<div id="landedOut" class="ph-caveat">Checks the beneficiary's balance across the `+
@@ -1177,6 +1295,26 @@ function argsBox(step,m){
     `<p class="mnote">Everything this step needs, in the order the runbook sets it.</p>`+
     `<pre class="argpre">${shown}</pre>`+
     `<button class="copy" id="argCopy">Copy arguments</button></div>`;
+}
+
+/* A child with no curator gets one back through proposeCurator, signed by the parent
+   curator. It takes a MultiAddress for an account the curators choose, so like Steps 2
+   and 4 the page lists the arguments and leaves the encoding to the wallet. */
+function proposeBox(m,rec){
+  const b=bounties.get(m.id), real=b?hexToSs58(b.curator):'?', L=[];
+  const row=(k,v)=>L.push('  '+k.padEnd(19)+v);
+  L.push('Submit from:       '+m.ms); L.push('proxy.proxy');
+  row('real:',real); row('force_proxy_type:','Governance');
+  L.push('  call: multiAssetBounties.proposeCurator');
+  L.push('    parent_bounty_id:  '+m.id);
+  L.push('    child_bounty_id:   Some('+rec.id+')');
+  L.push('    curator:           \u2190 the account you are proposing (MultiAddress::Id)');
+  const shown=esc(L.join('\n')).replace(/\u2190[^\n]*/g,x=>'<span class="you">'+x.slice(1).trim()+'</span>');
+  return `<div class="builder"><h3>Propose a new curator</h3>`+
+    `<p class="mnote">Signed by the parent curator through the multisig [S]. The child lands back `+
+    `in <strong>Funded</strong>, not Active \u2014 the proposed account then runs `+
+    `<strong>acceptCurator</strong> itself. Build it in Nova Spektr or Polkadot.js Apps.</p>`+
+    `<pre class="argpre">${shown}</pre><button class="copy" id="argCopy">Copy arguments</button></div>`;
 }
 
 function metaBox(m){
@@ -1368,21 +1506,31 @@ const expanded=new Set();
 function renderDoc(){
   const sec=SECTIONS[step]; if(!sec){$('doc').innerHTML='<p>Not found.</p>';return}
   let extra='';
-  if(BUILDERS[step]){
-    extra=`<div class="builder"><h3>Build the call for this step</h3><div class="brow">
+  if(NOVA[step]){
+    extra+=`<div class="nobuild"><strong style="color:var(--amber)">${NOVA[step][0]}</strong> `+
+      `${NOVA[step][1]}</div>`;
+  }
+  if(step==='s2'||step==='s4') extra+=argsBox(step,META[active]);
+  const calls=callsFor(step), here=childRec(META[active]);
+  if(here && here.status===2 && step==='s3' && sel!==null) extra+=proposeBox(META[active],here);
+  if(!calls.length && BUILDERS[step] && sel!==null){
+    const cur=(kids.get(META[active].id)||[]).find(c=>c.id===sel);
+    extra+=`<div class="nobuild">`+(cur
+      ? `None of this step\u2019s calls (${BUILDERS[step].map(b=>b[1]).join(', ')}) is accepted `+
+        `for a child that is <strong>${(STATUS[cur.status]||{n:'?'}).n}</strong>.`
+      : `This child no longer exists on chain, so there is nothing left to call.`)+`</div>`;
+  }
+  if(calls.length){
+    extra+=`<div class="builder"><h3>Build the call for this step</h3><div class="brow">
       <div><label for="act">Call</label><select id="act">`+
-      BUILDERS[step].map(([i,n])=>`<option value="${i}">${n}</option>`).join('')+
+      calls.map(([i,n])=>`<option value="${i}">${n}</option>`).join('')+
       `</select></div>
       <div id="childWrap"><label for="child">Child id <span style="text-transform:none;letter-spacing:0">(blank = parent)</span></label>
         <input id="child" type="number" min="0" step="1"></div>
       <div id="amtWrap"><label for="ivamt">Amount to add (DOT)</label>
         <input id="ivamt" type="number" min="0" step="any" placeholder="3999"></div>
       </div><div id="callout">Choose a call.</div></div>`;
-  } else if(NOVA[step]){
-    extra=`<div class="nobuild"><strong style="color:var(--amber)">${NOVA[step][0]}</strong> `+
-      `${NOVA[step][1]}</div>`;
   }
-  if(step==='s2'||step==='s4') extra+=argsBox(step,META[active]);
   if(step==='s1'){
     const mm=META[active], r=childRec(mm);
     /* A settled child's record arrives with its history. Until it does, say so \u2014
@@ -1446,7 +1594,7 @@ function renderDoc(){
   if(det) det.addEventListener('toggle',()=>{det.open?expanded.add(step):expanded.delete(step)});
   // a highlighted <span class="fill"> can leave its <pre> scrolled mid-token
   $('doc').querySelectorAll('pre').forEach(el=>{el.scrollLeft=0});
-  if(BUILDERS[step]){
+  if($('act')){
     ['act','child','ivamt'].forEach(i=>$(i)&&$(i).addEventListener('input',buildCall));
     const sv=$('ivamt'); if(sv) sv.addEventListener('input',()=>{
       const el=$('s0v'); if(el) el.innerHTML=step0Verdict(); });
@@ -1486,11 +1634,14 @@ function buildCall(){
     out.innerHTML=`<strong style="color:var(--tx)">multiAssetBounties.${name}</strong>`+
       `<div class="mono" style="font-size:12.5px;margin-top:5px">${argText}</div>`+
       `<code class="callhex">${toHex(bytes)}</code><button class="copy" id="cp">Copy call data</button>`+
-      `<div class="verify">Before signing: decode this in Polkadot.js → Developer → Extrinsics → Decode `+
-      `and confirm it matches the call and arguments above. Then wrap it as `+
-      `multisig → proxy.proxy (Governance) → this call.</div>`;
+      signerBox(idx,m,isIV?null:(()=>{const c=$('child').value.trim();return c===''?null:parseInt(c,10)})(),bytes)+
+      `<div class="verify">Before signing: decode it in Polkadot.js \u2192 Developer \u2192 Extrinsics \u2192 `+
+      `Decode and confirm it matches the call and arguments above.</div>`;
     $('cp').onclick=()=>{navigator.clipboard.writeText(toHex(bytes));
       $('cp').textContent='Copied';setTimeout(()=>$('cp').textContent='Copy call data',1400)};
+    const cpw=$('cpw');
+    if(cpw) cpw.onclick=()=>{navigator.clipboard.writeText(out.querySelector('.signers .callhex').textContent);
+      cpw.textContent='Copied';setTimeout(()=>cpw.textContent='Copy multisig call data',1400)};
   }catch(e){out.textContent='Could not encode: '+e.message}
 }
 function render(){
@@ -1538,6 +1689,7 @@ async function boot(){
     await connect();
     setBusy('reading chain');
     const chain=await rpc('system_chain'), head=await rpc('chain_getHeader');
+    const rv=await rpc('state_getRuntimeVersion'); specVersion=rv?rv.specVersion:null;
     await loadAll(setBusy);
     setConn(true,`${chain} · #${parseInt(head.number,16).toLocaleString()}`);
     if(sel===null) step=startStep(META[active]);
